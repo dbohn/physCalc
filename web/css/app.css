@@ -6510,14 +6510,20 @@ button.close {
 .bottom {
   padding-top: 50px;
 }
-.bottom .result_container {
-  border-bottom: 1px solid #dddddd;
+.bottom .result_container,
+.bottom .error_container {
   padding-bottom: 5px;
-  display: none;
 }
-.bottom .result_container .result {
+.bottom .result_container .result,
+.bottom .error_container .result,
+.bottom .result_container .error,
+.bottom .error_container .error {
   text-align: center;
   margin-top: 0;
+}
+.bottom .result_container .error,
+.bottom .error_container .error {
+  color: #d9534f;
 }
 .bottom footer {
   text-align: center;

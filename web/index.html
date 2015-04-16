@@ -22,12 +22,19 @@
 </div>
 <div class="bottom">
 	<div class="container">
+		<div class="row result_container hide">
+			<div class="col-md-12">
+				<h2 class="result">e=(<span class="median">5</span> &#177; <span class="radius">0.2</span>) &delta;e=<span class="rel_error">0.04</span></h2>
+			</div>
+		</div>
+		<div class="row error_container hide">
+			<div class="col-md-12">
+				<h2 class="error">Error</h2>
+			</div>
+		</div>
 		<div class="row">
 			<div class="col-md-12">
 				<div class="well">
-					<div class="result_container">
-						<h2 class="result">e=(<span class="median">5</span> &#177; <span class="radius">0.2</span>) &delta;e=<span class="rel_error">0.04</span></h2>
-					</div>
 					<h4>Tutorial</h4>
 					<p>Dieses Skript wertet die oben eingegebenen arithmetischen Ausdrücke aus. Folgende Operationen werden derzeit unterstützt:</p>
 					<ul>
@@ -38,6 +45,11 @@
 					<p>Die Besonderheit dieses Rechners ist jedoch, dass er in der Lage ist, eine Fehlerfortpflanzung des Maximalfehlers mit einzubeziehen.</p>
 					<p>Werte mit Messfehlern werden wie folgt dargestellt: <code>[&lt;Median&gt; +- &lt;Radius&gt;]</code>, wobei <code>&lt;Median&gt;</code> durch den Messwert ersetzt wird und <code>&lt;Radius&gt;</code> durch den absoluten Fehler. Diese Angaben lassen sich mit allen oben gelisteten Rechenarten verknüpfen.</p>
 					<p><strong>Wichtig: </strong> Bei der Potenz ist es wichtig, dass der absolute Fehler im Exponenten 0 ist, ansonsten kann die Berechnung nicht durchgeführt werden!</p>
+					<p>Standardmäßig werden die Ergebnisse als Zwischenergebnis ausgegeben (d.h. der Fehler wird mit zwei signifikanten Stellen angegeben). Möchte man allerdings ein Endergebnis erhalten, so stellt man einfach ein Gleichheitszeichen voran:</p>
+					<p><input type="text" value="([62.4+-0.2]-[11.2+-0.2])/[9.2+-0.2]" class="form-control" readonly="readonly"></p>
+					<h5>e=(5.57 &#177; 0.17) &delta;e=0.031</h5>
+					<p><input type="text" value="=([62.4+-0.2]-[11.2+-0.2])/[9.2+-0.2]" class="form-control" readonly="readonly"></p>
+					<h5>e=(5.6 &#177; 0.2) &delta;e=0.036</h5>
 				</div>
 			</div>
 		</div>

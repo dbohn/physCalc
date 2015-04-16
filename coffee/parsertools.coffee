@@ -73,4 +73,4 @@ create = (median, derivation) ->
 convVal = (a) ->
 	if !(a instanceof Physik.ErrorInterval) then create(a, 0) else a
 
-module.exports = {add, sub, mult, div, pow, create, endResult}
+module.exports = {add, sub, mult, div, pow, create, endResult, convVal}

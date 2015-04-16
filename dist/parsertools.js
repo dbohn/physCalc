@@ -69,7 +69,8 @@
     div: div,
     pow: pow,
     create: create,
-    endResult: endResult
+    endResult: endResult,
+    convVal: convVal
   };
 
 }).call(this);
