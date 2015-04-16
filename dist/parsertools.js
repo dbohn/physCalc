@@ -1,3 +1,9 @@
+
+/*
+ * Glue code between Physik-Library and parser
+ * @author David Bohn <david.bohn@cancrisoft.net>
+ */
+
 (function() {
   var Physik, add, convVal, create, div, endResult, mult, pow, sub;
 
