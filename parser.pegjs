@@ -17,9 +17,9 @@ multiplicative
   / power
 
 power
-  = left:number "^" right:primary { return parsertools.pow(left, right); }
-  / "(" additive:additive ")" "^" right:primary { return parsertools.pow(additive, right); }
-  / "[" median:number ws "+-" ws derivation:number "]" "^" right:primary { return parsertools.pow(parsertools.create(median, derivation), right); }
+  = left:number ws "^" ws right:primary { return parsertools.pow(left, right); }
+  / "(" additive:additive ")" ws "^" ws right:primary { return parsertools.pow(additive, right); }
+  / "[" median:number ws "+-" ws derivation:number "]" ws "^" ws right:primary { return parsertools.pow(parsertools.create(median, derivation), right); }
   / primary
 
 primary
