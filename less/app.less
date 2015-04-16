@@ -2,22 +2,12 @@
 
 @base:#269;
 
-html {
-	height: 100%;
-}
-
-body {
-	display: flex;
-	flex-direction: column;
-	height: 100%;
-}
+@headings-font-family: 'Roboto';
 
 .top {
 	// background-color:#269;
 	//padding: 20px;
 	text-align: center;
-	flex-grow: 1;
-	flex-basis: 33%;
 	background-color: lighten(@base, 10%);
 	background-image: linear-gradient(rgba(255,255,255,.5) 2px, transparent 2px),
 	linear-gradient(90deg, rgba(255,255,255,.5) 2px, transparent 2px),
@@ -26,17 +16,19 @@ body {
 	background-size:100px 100px, 100px 100px, 20px 20px, 20px 20px;
 	background-position:-2px -2px, -2px -2px, -1px -1px, -1px -1px;
 	h1 {
-		margin: 0;
 		font-size: @font-size-h1*2.5;
-		display: inline;
 		position: absolute;
 		width: 50%;
-		top: 10vh;
-		left: 25%;
+		 margin: auto;
+  position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
 		color: #fff;
 		font-weight: 100;
 		text-shadow: 0 0 15px #ccc;
+		height: 100px;
+
 	}
+	height: 300px;
 	position: relative;
 
 	.inputfield {
@@ -47,8 +39,6 @@ body {
 	}
 }
 .bottom {
-	flex-basis: 66%;
-	flex-grow: 2;
 	padding-top: 50px;
 
 	.result_container {

@@ -4,10 +4,11 @@
 	<meta charset="UTF-8">
 	<title>Physik Fehlerrechner</title>
 	<link rel="stylesheet" href="css/app.css">
+	<link href='http://fonts.googleapis.com/css?family=Roboto:500,100,300,400' rel='stylesheet' type='text/css'>
 </head>
 <body>
 <div class="top">
-	<h1>Physik Fehlerrechner</h1>
+	<h1>PhysCalc</h1>
 	<div class="inputfield">
 		<form name="calculator_input">
 			<div class="input-group input-group-lg">
@@ -28,7 +29,15 @@
 						<h2 class="result">e=(<span class="median">5</span> &#177; <span class="radius">0.2</span>) &delta;e=<span class="rel_error">0.04</span></h2>
 					</div>
 					<h4>Tutorial</h4>
-					<p>Hier könnte man ein kleines Tutorial zeigen...</p>
+					<p>Dieses Skript wertet die oben eingegebenen arithmetischen Ausdrücke aus. Folgende Operationen werden derzeit unterstützt:</p>
+					<ul>
+						<li>Addition (+), Subtraktion (-)</li>
+						<li>Multiplikation (*), Division (/)</li>
+						<li>Potenz (^)</li>
+					</ul>
+					<p>Die Besonderheit dieses Rechners ist jedoch, dass er in der Lage ist, eine Fehlerfortpflanzung des Maximalfehlers mit einzubeziehen.</p>
+					<p>Werte mit Messfehlern werden wie folgt dargestellt: <code>[&lt;Median&gt; +- &lt;Radius&gt;]</code>, wobei <code>&lt;Median&gt;</code> durch den Messwert ersetzt wird und <code>&lt;Radius&gt;</code> durch den absoluten Fehler. Diese Angaben lassen sich mit allen oben gelisteten Rechenarten verknüpfen.</p>
+					<p><strong>Wichtig: </strong> Bei der Potenz ist es wichtig, dass der absolute Fehler im Exponenten 0 ist, ansonsten kann die Berechnung nicht durchgeführt werden!</p>
 				</div>
 			</div>
 		</div>
