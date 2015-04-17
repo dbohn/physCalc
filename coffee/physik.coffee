@@ -110,13 +110,7 @@ class ErrorInterval
   # @param [Number] c the scalar
   # @return [ErrorInterval] result
   scalar: (c) ->
-    if c >= 0
-       return new ErrorInterval(@median * c, @radius * c)
-    else
-       a = @median * c
-       da = (@radius * c).toPrecision(2)
-
-       new ErrorInterval(a.toFixed(decimalPlaces(da)), da)
+    @mult new ErrorInterval(c,0)
 
   # Applys a function @code{f} to the interval.
   # The function has to accept one parameter and

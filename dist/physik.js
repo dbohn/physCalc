@@ -75,14 +75,7 @@
     };
 
     ErrorInterval.prototype.scalar = function(c) {
-      var a, da;
-      if (c >= 0) {
-        return new ErrorInterval(this.median * c, this.radius * c);
-      } else {
-        a = this.median * c;
-        da = (this.radius * c).toPrecision(2);
-        return new ErrorInterval(a.toFixed(decimalPlaces(da)), da);
-      }
+      return this.mult(new ErrorInterval(c, 0));
     };
 
     ErrorInterval.prototype.apply = function(f) {
