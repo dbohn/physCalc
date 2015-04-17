@@ -1202,6 +1202,14 @@ module.exports = (function () {
       return this.median + ' ' + this.radius;
     };
 
+    ErrorInterval.prototype.getMedian = function () {
+      return this.median.toFixed(decimalPlaces(this.radius));
+    };
+
+    ErrorInterval.prototype.getRadius = function () {
+      return '' + this.radius;
+    };
+
     return ErrorInterval;
   })();
 

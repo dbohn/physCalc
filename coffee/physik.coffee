@@ -140,6 +140,19 @@ class ErrorInterval
   toString: ->
     @median+' '+@radius
 
+  # Returns the median with the same number of digits after the comma 
+  # as the radius
+  #
+  # @return [String]
+  getMedian: ->
+    @median.toFixed(decimalPlaces(@radius))
+
+  # Returns the radius
+  #
+  # @return [String]
+  getRadius: ->
+    (''+@radius)
+
 
 
 aufg4 = ->
