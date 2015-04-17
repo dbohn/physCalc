@@ -6559,6 +6559,9 @@ button.close {
   border-color: #d9534f;
   border-top: none;
 }
+.error_container .infotext {
+  color: #d9534f;
+}
 .result_container {
   border-color: #5cb85c;
   border-top: none;

@@ -23,12 +23,12 @@ multiplicative
   / primary*/
 
 power
-  = operator:([a-zA-Z][a-zA-Z][a-zA-Z]) ws operand:primary ws "^" ws right:primary { return parsertools.pow(parsertools.applyOperator(operator.join(""), operand), right)}
+  = operator:(letter letter letter) ws operand:primary ws "^" ws right:primary { return parsertools.pow(parsertools.applyOperator(operator.join(""), operand), right)}
   / left:primary ws "^" ws right:primary { return parsertools.pow(left, right); }
   / sine
 
 sine
-  = operator:([a-zA-Z][a-zA-Z][a-zA-Z]) ws right:primary { return parsertools.applyOperator(operator.join(""), right); }
+  = operator:(letter letter letter) ws right:primary { return parsertools.applyOperator(operator.join(""), right); }
   / primary
 
 primary
@@ -36,7 +36,9 @@ primary
   / "(" additive:additive ")" { return additive; }
   / "[" median:number ws "+-" ws derivation:number "]" { return parsertools.create(median, Math.abs(derivation)); }
 
-number "number"
+number "eine Zahl"
   = sign:"-"? digits:[0-9.]+ { return sign === null ? parseFloat(digits.join("")) : (-1)*parseFloat(digits.join("")); }
 
-ws = [ \t\r\n]*
+letter "ein Buchstabe" = [a-zA-Z]
+
+ws "ein Leerzeichen" = [ \t\r\n]*
