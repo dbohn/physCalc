@@ -70,7 +70,6 @@
       default:
         operand = operand;
     }
-    console.log(operator);
     return operand;
   };
 

@@ -1095,7 +1095,6 @@ module.exports = (function () {
       default:
         operand = operand;
     }
-    console.log(operator);
     return operand;
   };
 

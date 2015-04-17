@@ -79,7 +79,6 @@ applyOperator = (operator, operand) ->
 		when "cos" then operand = operand.apply(Physik.cos)
 		when "tan" then operand = operand.apply(Physik.tan)
 		else operand = operand
-	console.log(operator)
 	operand
 
 convVal = (a) ->
