@@ -6488,7 +6488,7 @@ button.close {
   position: relative;
 }
 .top h1 {
-  font-size: 90px;
+  font-size: 8vw;
   width: 50%;
   margin: auto;
   position: absolute;
@@ -6500,6 +6500,14 @@ button.close {
   font-weight: 100;
   text-shadow: 0 0 15px #ccc;
   height: 100px;
+}
+@media (max-width: 767px) {
+  .top {
+    height: 150px;
+  }
+  .top h1 {
+    font-size: 10vw;
+  }
 }
 .top .inputfield {
   position: absolute;
