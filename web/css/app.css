@@ -6499,7 +6499,7 @@ button.close {
   color: #fff;
   font-weight: 100;
   text-shadow: 0 0 15px #ccc;
-  height: 100px;
+  height: 200px;
 }
 @media (max-width: 767px) {
   .top {
@@ -6507,6 +6507,7 @@ button.close {
   }
   .top h1 {
     font-size: 10vw;
+    height: 50px;
   }
 }
 .top .inputfield {
