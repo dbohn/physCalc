@@ -36,7 +36,7 @@ significantDigitsCeiling = (num, n) ->
 # Represents an error interval
 class ErrorInterval
 
-  # Construct a new error interval (a +/- Delta a)
+  # Constructs a new error interval (a +/- Delta a)
   #
   # @param [Float] median of the interval (a)
   # @param [Float] radius of the interval (Delta a)

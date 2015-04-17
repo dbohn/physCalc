@@ -2,38 +2,40 @@
 
 Autor: [Luca Keidel](https://github.com/lkdl)
 
-## Voraussetungen
-* nodejs (node) (Es sollte im Grunde auch jede andere JavaScript-Implementierung gehen, ich hab es aber nur mit node getestet.)
+## Voraussetzungen
+* nodejs (node) (Jede andere JavaScript-Implementierung sollte ebenfalls funktionieren)
 
 ## Starten
 
-1. Terminal öffnen, in den Ordner navigieren, in dem physik.js liegt
+1. Im Terminal zu dem Ordner `dist` navigieren
 2. `$ node`
 3. `> Physik = require('./physik')`
 
-## Rumspielen
+## Verwenden der Fehlerrechnung
 
-Nach dem Laden kann es losgehen, z.B. habe ich mal alle Werte von heute Vormittag gegengerechnet:
+Nach dem Laden kann es losgehen, z.B. mit arithmetichen Operationen,
+
+```
+> new Physik.ErrorInterval(0.62, 0.02).add(new Physik.ErrorInterval(0.82, 0.07))
+{ median: 1.44, radius: 0.09 }
+
+```
+mit Potenzen
 
 ```
 > new Physik.ErrorInterval(0.62, 0.02).pow(2)
 { median: 0.384, radius: 0.025 }
-> new Physik.ErrorInterval(0.91, 0.02).pow(2)
-{ median: 0.828, radius: 0.036 }
-> new Physik.ErrorInterval(0.112, 0.02).pow(2)
-{ median: 0.013, radius: 0.0045 }
-> new Physik.ErrorInterval(1.12, 0.02).pow(2)
-{ median: 1.254, radius: 0.045 }
-> new Physik.ErrorInterval(1.20, 0.02).pow(2)
-{ median: 1.44, radius: 0.049 }
-> new Physik.ErrorInterval(1.44, 0.02).pow(2)
-{ median: 2.074, radius: 0.058 }
+
+```
+oder auch mit trigonometrischen Funktionen:
+
+```
+> new Physik.ErrorInterval(45.00, 0.02).apply(Physik.sin)
+{ median: 0.7071, radius: 0.0025 } 
 
 ```
 
-Ich habe auch alle relevanten Aufgaben vorimplementiert um zu testen, ob das Tool auch richtig rechnet (Physik.aufg4(), ..., Physik.aufg12()).
-
-Was man alles mit ErrorInterval machen kann, ist in doc/index.html einsehbar
+Der gesamte unterstützte Funktionsumfang kann in der Dokumentation der API eingesehen werden (`doc/index.html`).
 
 # Parser
 
