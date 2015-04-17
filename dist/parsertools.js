@@ -1,1 +1,98 @@
-(function(){var n,r,t,e,a,o,u,i,c,s;n=require("./physik"),r=function(n,r){return n=e(n),r=e(r),n.add(r)},s=function(n,r){return n=e(n),r=e(r),n.sub(r)},i=function(n,r){return n=e(n),r=e(r),n.mult(r)},o=function(n,r){return n=e(n),r=e(r),n.div(r)},c=function(r,t){if(t instanceof n.ErrorInterval&&0!==t.radius)throw"Exponent must not have error";return t=t instanceof n.ErrorInterval?t.median:t,r=e(r),r.pow(t)},u=function(r){return r instanceof n.ErrorInterval?r.endResult():r},a=function(r,t){return new n.ErrorInterval(r,t)},t=function(r,t){switch(r=r.toLowerCase(),t=e(t),r){case"sin":t=t.apply(n.sin);break;case"cos":t=t.apply(n.cos);break;case"tan":t=t.apply(n.tan);break;default:t=t}return t},e=function(r){return r instanceof n.ErrorInterval?r:a(r,0)},module.exports={add:r,sub:s,mult:i,div:o,pow:c,create:a,endResult:u,convVal:e,applyOperator:t}}).call(this);
+
+/*
+ * Glue code between Physik-Library and parser
+ * @author David Bohn <david.bohn@cancrisoft.net>
+ */
+
+(function() {
+  var Physik, add, applyOperator, convVal, create, div, endResult, mult, pow, sub;
+
+  Physik = require('./physik');
+
+  add = function(a, b) {
+    a = convVal(a);
+    b = convVal(b);
+    return a.add(b);
+  };
+
+  sub = function(a, b) {
+    a = convVal(a);
+    b = convVal(b);
+    return a.sub(b);
+  };
+
+  mult = function(a, b) {
+    a = convVal(a);
+    b = convVal(b);
+    return a.mult(b);
+  };
+
+  div = function(a, b) {
+    a = convVal(a);
+    b = convVal(b);
+    return a.div(b);
+  };
+
+  pow = function(base, exp) {
+    if (exp instanceof Physik.ErrorInterval && exp.radius !== 0) {
+      throw 'Exponent must not have error';
+    }
+    exp = exp instanceof Physik.ErrorInterval ? exp.median : exp;
+    base = convVal(base);
+    return base.pow(exp);
+  };
+
+  endResult = function(a) {
+    if (a instanceof Physik.ErrorInterval) {
+      return a.endResult();
+    } else {
+      return a;
+    }
+  };
+
+  create = function(median, derivation) {
+    return new Physik.ErrorInterval(median, derivation);
+  };
+
+  applyOperator = function(operator, operand) {
+    operator = operator.toLowerCase();
+    operand = convVal(operand);
+    switch (operator) {
+      case "sin":
+        operand = operand.apply(Physik.sin);
+        break;
+      case "cos":
+        operand = operand.apply(Physik.cos);
+        break;
+      case "tan":
+        operand = operand.apply(Physik.tan);
+        break;
+      default:
+        operand = operand;
+    }
+    return operand;
+  };
+
+  convVal = function(a) {
+    if (!(a instanceof Physik.ErrorInterval)) {
+      return create(a, 0);
+    } else {
+      return a;
+    }
+  };
+
+  module.exports = {
+    add: add,
+    sub: sub,
+    mult: mult,
+    div: div,
+    pow: pow,
+    create: create,
+    endResult: endResult,
+    convVal: convVal,
+    applyOperator: applyOperator
+  };
+
+}).call(this);
+
+//# sourceMappingURL=parsertools.js.map

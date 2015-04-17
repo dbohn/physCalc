@@ -1,25 +1,103 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-"use strict";
+'use strict';
 
 (function () {
-  var e, r, n, t, s, i, a, o, u, c, l, d, h, m, L;u = require("./parser"), c = require("./parsertools"), a = document.querySelector("form[name=calculator_input]"), m = document.querySelector(".result_container"), t = document.querySelector(".error_container"), h = m.querySelector(".result"), s = t.querySelector(".error"), i = t.querySelector(".infotext"), o = h.querySelector(".median"), l = h.querySelector(".radius"), d = h.querySelector(".rel_error"), a.addEventListener("submit", function (t) {
-    var s, i, h, L;if ((t.preventDefault(), h = a[0].value.trim(), "" !== h)) try {
-      return (L = u.parse(h), L = c.convVal(L), m.classList.remove("hide"), a.classList.add("has-success"), o.innerHTML = L.getMedian(), l.innerHTML = L.getRadius(), d.innerHTML = L.relativeError());
-    } catch (f) {
-      return (i = f, console.log(i), i instanceof u.SyntaxError ? (s = "Es wurde " + e(i.expected) + " erwartet. Gefunden wurde aber " + r(i.found) + ".", n("Der Ausdruck enthält einen syntaktische Fehler an Position " + i.column + "!", s)) : n("Exponent must not have error" === i ? "Der absolute Fehler des Exponenten muss 0 sein!" : "Ein unbekannter Fehler ist aufgetreten!"));
+  var connectList, convertFound, error, errorContainer, errorElem, errorInfo, form, median, parser, parsertools, radius, relError, result, resultContainer, stringifyItem;
+
+  parser = require('./parser');
+
+  parsertools = require('./parsertools');
+
+  form = document.querySelector('form[name=calculator_input]');
+
+  resultContainer = document.querySelector('.result_container');
+
+  errorContainer = document.querySelector('.error_container');
+
+  result = resultContainer.querySelector('.result');
+
+  errorElem = errorContainer.querySelector('.error');
+
+  errorInfo = errorContainer.querySelector('.infotext');
+
+  median = result.querySelector('.median');
+
+  radius = result.querySelector('.radius');
+
+  relError = result.querySelector('.rel_error');
+
+  form.addEventListener('submit', function (ev) {
+    var desc, err, query, resError;
+    ev.preventDefault();
+    query = form[0].value.trim();
+    if (query === '') {
+      return;
     }
-  }), a[0].addEventListener("change", function (e) {
-    return (a.classList.remove("has-error"), a.classList.remove("has-success"), t.classList.add("hide"), m.classList.add("hide"));
-  }), r = function (e) {
-    return null === e ? "nichts" : "\"" + e + "\"";
-  }, e = function (e) {
-    return 1 === e.length ? L(e[0]) : e.slice(0, e.length - 1).map(L).join(", ") + " oder " + L(e[e.length - 1]);
-  }, L = function (e) {
-    return "end" === e.type ? "das Eingabeende" : e.description;
-  }, n = function (e) {
-    return (a.classList.add("has-error"), a.classList.remove("has-success"), t.classList.remove("hide"), s.innerHTML = e, i.innerHTML = "", 2 === arguments.length ? i.innerHTML = arguments[1] : void 0);
+    try {
+      resError = parser.parse(query);
+      resError = parsertools.convVal(resError);
+      resultContainer.classList.remove('hide');
+      form.classList.add('has-success');
+      median.innerHTML = resError.getMedian();
+      radius.innerHTML = resError.getRadius();
+      return relError.innerHTML = resError.relativeError();
+    } catch (_error) {
+      err = _error;
+      console.log(err);
+      if (err instanceof parser.SyntaxError) {
+        desc = 'Es wurde ' + connectList(err.expected) + ' erwartet. Gefunden wurde aber ' + convertFound(err.found) + '.';
+        return error('Der Ausdruck enthält einen syntaktische Fehler an Position ' + err.column + '!', desc);
+      } else if (err === 'Exponent must not have error') {
+        return error('Der absolute Fehler des Exponenten muss 0 sein!');
+      } else {
+        return error('Ein unbekannter Fehler ist aufgetreten!');
+      }
+    }
+  });
+
+  form[0].addEventListener('change', function (ev) {
+    form.classList.remove('has-error');
+    form.classList.remove('has-success');
+    errorContainer.classList.add('hide');
+    return resultContainer.classList.add('hide');
+  });
+
+  convertFound = function (found) {
+    if (found === null) {
+      return 'nichts';
+    } else {
+      return '"' + found + '"';
+    }
+  };
+
+  connectList = function (list) {
+    if (list.length === 1) {
+      return stringifyItem(list[0]);
+    }
+    return list.slice(0, list.length - 1).map(stringifyItem).join(', ') + ' oder ' + stringifyItem(list[list.length - 1]);
+  };
+
+  stringifyItem = function (item) {
+    if (item.type === 'end') {
+      return 'das Eingabeende';
+    } else {
+      return item.description;
+    }
+  };
+
+  error = function (msg) {
+    form.classList.add('has-error');
+    form.classList.remove('has-success');
+    errorContainer.classList.remove('hide');
+    errorElem.innerHTML = msg;
+    errorInfo.innerHTML = '';
+    if (arguments.length === 2) {
+      return errorInfo.innerHTML = arguments[1];
+    }
   };
 }).call(undefined);
+
+//# sourceMappingURL=index.js.map
 
 },{"./parser":2,"./parsertools":3}],2:[function(require,module,exports){
 "use strict";
@@ -961,97 +1039,325 @@ module.exports = (function () {
 })();
 
 },{"./parsertools":3}],3:[function(require,module,exports){
-"use strict";
+
+/*
+ * Glue code between Physik-Library and parser
+ * @author David Bohn <david.bohn@cancrisoft.net>
+ */
+
+'use strict';
 
 (function () {
-  var n, r, t, e, a, o, u, i, c, s;n = require("./physik"), r = function (n, r) {
-    return (n = e(n), r = e(r), n.add(r));
-  }, s = function (n, r) {
-    return (n = e(n), r = e(r), n.sub(r));
-  }, i = function (n, r) {
-    return (n = e(n), r = e(r), n.mult(r));
-  }, o = function (n, r) {
-    return (n = e(n), r = e(r), n.div(r));
-  }, c = function (r, t) {
-    if (t instanceof n.ErrorInterval && 0 !== t.radius) throw "Exponent must not have error";return (t = t instanceof n.ErrorInterval ? t.median : t, r = e(r), r.pow(t));
-  }, u = function (r) {
-    return r instanceof n.ErrorInterval ? r.endResult() : r;
-  }, a = function (r, t) {
-    return new n.ErrorInterval(r, t);
-  }, t = function (r, t) {
-    switch ((r = r.toLowerCase(), t = e(t), r)) {case "sin":
-        t = t.apply(n.sin);break;case "cos":
-        t = t.apply(n.cos);break;case "tan":
-        t = t.apply(n.tan);break;default:
-        t = t;}return t;
-  }, e = function (r) {
-    return r instanceof n.ErrorInterval ? r : a(r, 0);
-  }, module.exports = { add: r, sub: s, mult: i, div: o, pow: c, create: a, endResult: u, convVal: e, applyOperator: t };
+  var Physik, add, applyOperator, convVal, create, div, endResult, mult, pow, sub;
+
+  Physik = require('./physik');
+
+  add = function (a, b) {
+    a = convVal(a);
+    b = convVal(b);
+    return a.add(b);
+  };
+
+  sub = function (a, b) {
+    a = convVal(a);
+    b = convVal(b);
+    return a.sub(b);
+  };
+
+  mult = function (a, b) {
+    a = convVal(a);
+    b = convVal(b);
+    return a.mult(b);
+  };
+
+  div = function (a, b) {
+    a = convVal(a);
+    b = convVal(b);
+    return a.div(b);
+  };
+
+  pow = function (base, exp) {
+    if (exp instanceof Physik.ErrorInterval && exp.radius !== 0) {
+      throw 'Exponent must not have error';
+    }
+    exp = exp instanceof Physik.ErrorInterval ? exp.median : exp;
+    base = convVal(base);
+    return base.pow(exp);
+  };
+
+  endResult = function (a) {
+    if (a instanceof Physik.ErrorInterval) {
+      return a.endResult();
+    } else {
+      return a;
+    }
+  };
+
+  create = function (median, derivation) {
+    return new Physik.ErrorInterval(median, derivation);
+  };
+
+  applyOperator = function (operator, operand) {
+    operator = operator.toLowerCase();
+    operand = convVal(operand);
+    switch (operator) {
+      case 'sin':
+        operand = operand.apply(Physik.sin);
+        break;
+      case 'cos':
+        operand = operand.apply(Physik.cos);
+        break;
+      case 'tan':
+        operand = operand.apply(Physik.tan);
+        break;
+      default:
+        operand = operand;
+    }
+    return operand;
+  };
+
+  convVal = function (a) {
+    if (!(a instanceof Physik.ErrorInterval)) {
+      return create(a, 0);
+    } else {
+      return a;
+    }
+  };
+
+  module.exports = {
+    add: add,
+    sub: sub,
+    mult: mult,
+    div: div,
+    pow: pow,
+    create: create,
+    endResult: endResult,
+    convVal: convVal,
+    applyOperator: applyOperator
+  };
 }).call(undefined);
+
+//# sourceMappingURL=parsertools.js.map
 
 },{"./physik":4}],4:[function(require,module,exports){
-"use strict";
+'use strict';
 
 (function () {
-  var t, n, e, r, i, o, a, u, s, d, c, h, f, l, p;c = function (t) {
-    var n;return (n = ("" + t).match(/(?:\.(\d+))?(?:[eE]([+-]?\d+))?$/), n ? Math.max(0, (n[1] ? n[1].length : 0) - (n[2] ? +n[2] : 0)) : 0);
-  }, h = Math.log10 || function (t) {
-    return Math.log(t) / Math.LN10;
-  }, f = function (t, n) {
-    var e, r, i, o;return 0 === t ? 0 : (e = Math.ceil(h(0 > t ? -t : t)), i = n - Math.floor(e), r = Math.pow(10, i), o = Math.ceil(t * r), o / r);
-  }, t = (function () {
-    function t(t, n) {
-      this.median = parseFloat(t), this.radius = parseFloat(n);
-    }return (t.prototype.relativeError = function () {
+  var ErrorInterval, aufg10, aufg11, aufg11_example, aufg12, aufg4, aufg6, aufg8, aufg9, cos, createFromAnalogMeasurement, createFromDigitalMeasurement, decimalPlaces, log10, significantDigitsCeiling, sin, tan;
+
+  decimalPlaces = function (num) {
+    var match;
+    match = ('' + num).match(/(?:\.(\d+))?(?:[eE]([+-]?\d+))?$/);
+    if (!match) {
+      return 0;
+    }
+    return Math.max(0, (match[1] ? match[1].length : 0) - (match[2] ? +match[2] : 0));
+  };
+
+  log10 = Math.log10 || function (x) {
+    return Math.log(x) / Math.LN10;
+  };
+
+  significantDigitsCeiling = function (num, n) {
+    var d, magnitude, power, shifted;
+    if (num === 0) {
+      return 0;
+    }
+    d = Math.ceil(log10(num < 0 ? -num : num));
+    power = n - Math.floor(d);
+    magnitude = Math.pow(10, power);
+    shifted = Math.ceil(num * magnitude);
+    return shifted / magnitude;
+  };
+
+  ErrorInterval = (function () {
+    function ErrorInterval(median, radius) {
+      this.median = parseFloat(median);
+      this.radius = parseFloat(radius);
+    }
+
+    ErrorInterval.prototype.relativeError = function () {
       return parseFloat((this.radius / this.median).toPrecision(2));
-    }, t.prototype.add = function (n) {
-      var e, r;return (e = this.median + n.median, r = (this.radius + n.radius).toPrecision(2), new t(e.toFixed(c(r)), r));
-    }, t.prototype.sub = function (n) {
-      var e, r;return (e = this.median - n.median, r = (this.radius + n.radius).toPrecision(2), new t(e.toFixed(c(r)), r));
-    }, t.prototype.mult = function (n) {
-      var e, r, i;return (e = this.median * n.median, i = (this.relativeError() + n.relativeError()).toPrecision(2), r = (i * e).toPrecision(2), new t(e.toFixed(c(r)), r));
-    }, t.prototype.div = function (n) {
-      var e, r, i;return (e = this.median / n.median, i = (this.relativeError() + n.relativeError()).toPrecision(2), r = (i * e).toPrecision(2), new t(e.toFixed(c(r)), r));
-    }, t.prototype.pow = function (n) {
-      var e, r, i;return (e = Math.pow(this.median, n), i = (this.relativeError() * Math.abs(n)).toPrecision(2), r = (i * e).toPrecision(2), new t(e.toFixed(c(r)), r));
-    }, t.prototype.scalar = function (n) {
-      return this.mult(new t(n, 0));
-    }, t.prototype.apply = function (n) {
-      var e, r;return (r = n(this.median), e = Math.abs(n(this.median + this.radius) - r).toPrecision(2), new t(r.toFixed(c(e)), e));
-    }, t.prototype.endResult = function () {
-      var n, e;return (n = f(this.radius, 1), e = this.median.toFixed(c(n)), new t(e, n));
-    }, t.prototype.toString = function () {
-      return this.median + " " + this.radius;
-    }, t.prototype.getMedian = function () {
-      return this.median.toFixed(c(this.radius));
-    }, t.prototype.getRadius = function () {
-      return "" + this.radius;
-    }, t);
-  })(), o = function () {
-    return new t(52.684063, 0.0176228).endResult();
-  }, a = function () {
-    return new t(34.7, 7.6).relativeError();
-  }, u = function () {
-    var n, e, r;return (n = new t(200, 0.5), e = new t(200, 0.5), r = new t(104.7, 1.5), n.add(e).add(r).endResult());
-  }, s = function () {
-    var n, e;return (n = new t(100, 10), e = new t(11.2, 0.3), n.div(e).scalar(3.6).endResult());
-  }, n = function () {
-    var n, e, r;return (n = new t(1, 0.002), e = new t(20, 0.11), r = new t(2.4, 0.2), e.div(r).pow(0.5).mult(n).endResult());
-  }, r = function () {
-    var n, e, r;return (n = new t(62.4, 0.2), e = new t(11.2, 0.2), r = new t(9.2, 0.2), n.sub(e).div(r).endResult());
-  }, e = function () {
-    var n, e;return (e = new t(71, 2), n = new t(400, 5), new t(1000, 0).div(n.div(e)).endResult());
-  }, i = function () {
-    var n, e, r;return (e = new t(632.8, 0), n = new t(13.4, 0.5), r = n.apply(function (t) {
-      return Math.sin(t * (Math.PI / 180));
-    }), e.div(r).scalar(0.001).endResult());
-  }, l = function (t) {
-    return Math.sin(t * (Math.PI / 180));
-  }, d = function (t) {
-    return Math.cos(t * (Math.PI / 180));
-  }, p = function (t) {
-    return Math.tan(t * (Math.PI / 180));
-  }, module.exports = { ErrorInterval: t, aufg4: o, aufg6: a, aufg8: u, aufg9: s, aufg10: n, aufg11_example: r, aufg11: e, aufg12: i, sin: l, cos: d, tan: p };
+    };
+
+    ErrorInterval.prototype.add = function (o) {
+      var a, da;
+      a = this.median + o.median;
+      da = (this.radius + o.radius).toPrecision(2);
+      return new ErrorInterval(a.toFixed(decimalPlaces(da)), da);
+    };
+
+    ErrorInterval.prototype.sub = function (o) {
+      var a, da;
+      a = this.median - o.median;
+      da = (this.radius + o.radius).toPrecision(2);
+      return new ErrorInterval(a.toFixed(decimalPlaces(da)), da);
+    };
+
+    ErrorInterval.prototype.mult = function (o) {
+      var a, da, rel;
+      a = this.median * o.median;
+      rel = (this.relativeError() + o.relativeError()).toPrecision(2);
+      da = (rel * a).toPrecision(2);
+      return new ErrorInterval(a.toFixed(decimalPlaces(da)), da);
+    };
+
+    ErrorInterval.prototype.div = function (o) {
+      var a, da, rel;
+      a = this.median / o.median;
+      rel = (this.relativeError() + o.relativeError()).toPrecision(2);
+      da = (rel * a).toPrecision(2);
+      return new ErrorInterval(a.toFixed(decimalPlaces(da)), da);
+    };
+
+    ErrorInterval.prototype.pow = function (exp) {
+      var a, da, rel;
+      a = Math.pow(this.median, exp);
+      rel = (this.relativeError() * Math.abs(exp)).toPrecision(2);
+      da = (rel * a).toPrecision(2);
+      return new ErrorInterval(a.toFixed(decimalPlaces(da)), da);
+    };
+
+    ErrorInterval.prototype.scalar = function (c) {
+      return this.mult(new ErrorInterval(c, 0));
+    };
+
+    ErrorInterval.prototype.apply = function (f) {
+      var dk, k;
+      k = f(this.median);
+      dk = Math.abs(f(this.median + this.radius) - k).toPrecision(2);
+      return new ErrorInterval(k.toFixed(decimalPlaces(dk)), dk);
+    };
+
+    ErrorInterval.prototype.endResult = function () {
+      var resMedian, resRadius;
+      resRadius = significantDigitsCeiling(this.radius, 1);
+      resMedian = this.median.toFixed(decimalPlaces(resRadius));
+      return new ErrorInterval(resMedian, resRadius);
+    };
+
+    ErrorInterval.prototype.intermediateResult = function () {
+      var resMedian, resRadius;
+      resRadius = this.radius.toPrecision(2);
+      resMedian = this.median.toFixed(decimalPlaces(resRadius));
+      return new ErrorInterval(resMedian, resRadius);
+    };
+
+    ErrorInterval.prototype.toString = function () {
+      return this.median + ' ' + this.radius;
+    };
+
+    ErrorInterval.prototype.getMedian = function () {
+      return this.median.toFixed(decimalPlaces(this.radius));
+    };
+
+    ErrorInterval.prototype.getRadius = function () {
+      return '' + this.radius;
+    };
+
+    return ErrorInterval;
+  })();
+
+  createFromAnalogMeasurement = function (val, k, range) {
+    var da, dk;
+    dk = k / 100 * range;
+    da = val.radius;
+    return new ErrorInterval(val.median, dk + da);
+  };
+
+  createFromDigitalMeasurement = function (val, p, d) {
+    var da;
+    da = p / 100 * val.median;
+    da += d * Math.pow(10, -decimalPlaces(val.median));
+    return new ErrorInterval(val.median, da);
+  };
+
+  aufg4 = function () {
+    return new ErrorInterval(52.684063, 0.0176228).endResult();
+  };
+
+  aufg6 = function () {
+    return new ErrorInterval(34.7, 7.6).relativeError();
+  };
+
+  aufg8 = function () {
+    var l1, l2, l3;
+    l1 = new ErrorInterval(200, 0.5);
+    l2 = new ErrorInterval(200, 0.5);
+    l3 = new ErrorInterval(104.7, 1.5);
+    return l1.add(l2).add(l3).endResult();
+  };
+
+  aufg9 = function () {
+    var s, t;
+    s = new ErrorInterval(100, 10);
+    t = new ErrorInterval(11.2, 0.3);
+    return s.div(t).scalar(3.6).endResult();
+  };
+
+  aufg10 = function () {
+    var r, t0, t1;
+    r = new ErrorInterval(1, 0.002);
+    t0 = new ErrorInterval(20, 0.11);
+    t1 = new ErrorInterval(2.4, 0.2);
+    return t0.div(t1).pow(0.5).mult(r).endResult();
+  };
+
+  aufg11_example = function () {
+    var a, b, c;
+    a = new ErrorInterval(62.4, 0.2);
+    b = new ErrorInterval(11.2, 0.2);
+    c = new ErrorInterval(9.2, 0.2);
+    return a.sub(b).div(c).endResult();
+  };
+
+  aufg11 = function () {
+    var s, t;
+    t = new ErrorInterval(71, 2);
+    s = new ErrorInterval(400, 5);
+    return new ErrorInterval(1000, 0).div(s.div(t)).endResult();
+  };
+
+  aufg12 = function () {
+    var alpha, mu, sinAlpha;
+    mu = new ErrorInterval(632.8, 0);
+    alpha = new ErrorInterval(13.4, 0.5);
+    sinAlpha = alpha.apply(function (val) {
+      return Math.sin(val * (Math.PI / 180));
+    });
+    return mu.div(sinAlpha).scalar(0.001).endResult();
+  };
+
+  sin = function (v) {
+    return Math.sin(v * (Math.PI / 180));
+  };
+
+  cos = function (v) {
+    return Math.cos(v * (Math.PI / 180));
+  };
+
+  tan = function (v) {
+    return Math.tan(v * (Math.PI / 180));
+  };
+
+  module.exports = {
+    ErrorInterval: ErrorInterval,
+    aufg4: aufg4,
+    aufg6: aufg6,
+    aufg8: aufg8,
+    aufg9: aufg9,
+    aufg10: aufg10,
+    aufg11_example: aufg11_example,
+    aufg11: aufg11,
+    aufg12: aufg12,
+    sin: sin,
+    cos: cos,
+    tan: tan,
+    createFromAnalogMeasurement: createFromAnalogMeasurement,
+    createFromDigitalMeasurement: createFromDigitalMeasurement
+  };
 }).call(undefined);
+
+//# sourceMappingURL=physik.js.map
 
 },{}]},{},[1]);

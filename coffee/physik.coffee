@@ -128,13 +128,22 @@ class ErrorInterval
   # Create an error interval based on this interval
   # with the precision of end results.
   #
-  # @param [ErrorInterval] o the other interval
   # @return [ErrorInterval] result
   endResult: ->
     resRadius = significantDigitsCeiling(@radius, 1)
-    resZentralwert = @median.toFixed  (decimalPlaces resRadius)
+    resMedian = @median.toFixed  (decimalPlaces resRadius)
 
-    new ErrorInterval(resZentralwert, resRadius)
+    new ErrorInterval(resMedian, resRadius)
+
+  # Create an error interval based on this interval
+  # with the precision of intermediate results.
+  #
+  # @return [ErrorInterval] result
+  intermediateResult: ->
+    resRadius = @radius.toPrecision(2)
+    resMedian = @median.toFixed  (decimalPlaces resRadius)
+  
+    new ErrorInterval(resMedian, resRadius)    
 
   # @return [String]
   toString: ->
@@ -154,6 +163,31 @@ class ErrorInterval
     (''+@radius)
 
 
+# Creates an error interval based on an
+# analog measurement
+#
+# @param [ErrorInterval] val the datum
+# @param [Float] k the quality
+# @param [Float] range range
+# 
+# @return [ErrorInterval] result
+createFromAnalogMeasurement = (val, k, range) ->
+  dk = (k / 100) * range
+  da = val.radius
+  new ErrorInterval(val.median, (dk+da))
+
+# Creates an error interval based on an
+# digital measurement
+#
+# @param [ErrorInterval] val the datum
+# @param [Float] p 
+# @param [Integer] d
+# 
+# @return [ErrorInterval] result
+createFromDigitalMeasurement = (val, p, d) ->
+  da = ((p / 100) * val.median)
+  da += d * Math.pow(10, -decimalPlaces val.median)  
+  new ErrorInterval(val.median, da)
 
 aufg4 = ->
   new ErrorInterval(52.684063, 0.0176228).endResult()
@@ -206,4 +240,4 @@ cos = (v) ->
 tan = (v) ->
   Math.tan(v * (Math.PI / 180))
 
-module.exports = {ErrorInterval, aufg4, aufg6, aufg8, aufg9, aufg10, aufg11_example, aufg11, aufg12, sin, cos, tan}
+module.exports = {ErrorInterval, aufg4, aufg6, aufg8, aufg9, aufg10, aufg11_example, aufg11, aufg12, sin, cos, tan, createFromAnalogMeasurement, createFromDigitalMeasurement}
