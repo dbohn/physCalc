@@ -20,8 +20,8 @@ form.addEventListener('submit', (ev) ->
 		resError = parsertools.convVal(resError)
 		resultContainer.classList.remove('hide')
 		form.classList.add('has-success')
-		median.innerHTML = resError.median
-		radius.innerHTML = resError.radius
+		median.innerHTML = resError.getMedian()
+		radius.innerHTML = resError.getRadius()
 		relError.innerHTML = resError.relativeError()
 	catch err
 		console.log(err)
