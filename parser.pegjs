@@ -34,9 +34,9 @@ sine
 primary
   = number
   / "(" additive:additive ")" { return additive; }
-  / "[" median:number ws "+-" ws derivation:number "]" { return parsertools.create(median, derivation); }
+  / "[" median:number ws "+-" ws derivation:number "]" { return parsertools.create(median, Math.abs(derivation)); }
 
 number "number"
-  = digits:[0-9.]+ { return parseFloat(digits.join("")); }
+  = sign:"-"? digits:[0-9.]+ { return sign === null ? parseFloat(digits.join("")) : (-1)*parseFloat(digits.join("")); }
 
 ws = [ \t\r\n]*
