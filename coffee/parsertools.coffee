@@ -70,7 +70,19 @@ endResult = (a) ->
 create = (median, derivation) ->
 	new Physik.ErrorInterval(median, derivation)
 
+applyOperator = (operator, operand) ->
+	operator = operator.toLowerCase()
+	operand = convVal(operand)
+	# TODO: throw exception for unknown operand!
+	switch operator
+		when "sin" then operand = operand.apply(Physik.sin)
+		when "cos" then operand = operand.apply(Physik.cos)
+		when "tan" then operand = operand.apply(Physik.tan)
+		else operand = operand
+	console.log(operator)
+	operand
+
 convVal = (a) ->
 	if !(a instanceof Physik.ErrorInterval) then create(a, 0) else a
 
-module.exports = {add, sub, mult, div, pow, create, endResult, convVal}
+module.exports = {add, sub, mult, div, pow, create, endResult, convVal, applyOperator}

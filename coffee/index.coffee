@@ -14,14 +14,17 @@ relError = result.querySelector('.rel_error')
 form.addEventListener('submit', (ev) ->
 	ev.preventDefault()
 	query = form[0].value
+	if query is '' then return
 	try
 		resError = parser.parse(query)
 		resError = parsertools.convVal(resError)
 		resultContainer.classList.remove('hide')
+		form.classList.add('has-success')
 		median.innerHTML = resError.median
 		radius.innerHTML = resError.radius
 		relError.innerHTML = resError.relativeError()
 	catch err
+		console.log(err)
 		if err == 'Exponent must not have error'
 			error('Der absolute Fehler des Exponenten muss 0 sein!')
 		else
@@ -30,11 +33,13 @@ form.addEventListener('submit', (ev) ->
 
 form[0].addEventListener('change', (ev) ->
 	form.classList.remove('has-error')
+	form.classList.remove('has-success')
 	errorContainer.classList.add('hide')
 	resultContainer.classList.add('hide')
 )
 
 error = (msg) ->
 	form.classList.add('has-error')
+	form.classList.remove('has-success')
 	errorContainer.classList.remove('hide')
 	errorElem.innerHTML = msg

@@ -23,12 +23,16 @@ multiplicative
   / primary*/
 
 power
-  = operator:([a-zA-Z][a-zA-Z][a-zA-Z]) ws operand:primary ws "^" ws right:primary { return parsertools.pow(parsertools.applyOperator(operator.join(""), operand), right)}
-  / left:primary ws "^" ws right:primary { return parsertools.pow(left, right); }
+  = "sin" ws primary ws "^" ws right:sine
+  / "cos" ws primary ws "^" ws right:sine
+  / "tan" ws primary ws "^" ws right:sine
+  / primary ws "^" ws right:sine
   / sine
 
 sine
-  = operator:([a-zA-Z][a-zA-Z][a-zA-Z]) ws right:primary { return parsertools.applyOperator(operator.join(""), right); }
+  = "sin" ws primary
+  / "cos" ws primary
+  / "tan" ws primary
   / primary
 
 primary

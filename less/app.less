@@ -15,45 +15,92 @@
 	linear-gradient(90deg, rgba(255,255,255,.3) 1px, transparent 1px);
 	background-size:100px 100px, 100px 100px, 20px 20px, 20px 20px;
 	background-position:-2px -2px, -2px -2px, -1px -1px, -1px -1px;
+
+	height: 300px;
+	position: relative;
+	
 	h1 {
 		font-size: @font-size-h1*2.5;
 		position: absolute;
 		width: 50%;
-		 margin: auto;
-  position: absolute;
-  top: 0; left: 0; bottom: 0; right: 0;
+		margin: auto;
+  		position: absolute;
+  		top: 0; left: 0; bottom: 0; right: 0;
 		color: #fff;
 		font-weight: 100;
 		text-shadow: 0 0 15px #ccc;
 		height: 100px;
-
 	}
-	height: 300px;
-	position: relative;
 
 	.inputfield {
 		position: absolute;
 		bottom: -23px;
 		width: 50%;
 		left: 25%;
+
+		.has-error, .has-success {
+			button {
+				border-bottom-right-radius: 0;
+			}
+
+			input {
+				border-bottom-left-radius: 0;
+			}
+		}
+
+		.has-error {
+			button {
+				border-color: @brand-danger;
+			}
+		}
+
+		.has-success {
+			button {
+				border-color: @brand-success;
+			}
+		}
 	}
 }
+
+.result_container, .error_container {
+	background: #fff;
+	padding: 10px 0;
+	margin-left: 0;
+	z-index: 200;
+	border: 1px solid @gray-lighter;
+	box-shadow: 1px 3px 3px @gray-lighter;
+	border-radius: @border-radius-base;
+	border-top-left-radius: 0;
+	border-top-right-radius: 0;
+
+	width: 100%;
+
+	position: absolute;
+
+	padding-bottom: 5px;
+
+	.result, .error {
+		text-align: center;
+		margin-top: 0;
+	}
+
+	.error {
+		color: @brand-danger;
+	}
+}
+
+.error_container {
+	border-color: @brand-danger;
+	border-top: none;
+}
+
+.result_container {
+	border-color: @brand-success;
+	border-top: none;
+}
+
 .bottom {
 	padding-top: 50px;
-
-	.result_container, .error_container {
-
-		padding-bottom: 5px;
-
-		.result, .error {
-			text-align: center;
-			margin-top: 0;
-		}
-
-		.error {
-			color: @brand-danger;
-		}
-	}
 
 	footer {
 		text-align: center;
