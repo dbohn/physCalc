@@ -1,5 +1,7 @@
 # Modul zur Fehlerrechnung
 
+Autor: [Luca Keidel](https://github.com/lkdl)
+
 ## Voraussetungen
 * nodejs (node) (Es sollte im Grunde auch jede andere JavaScript-Implementierung gehen, ich hab es aber nur mit node getestet.)
 
@@ -33,10 +35,15 @@ Ich habe auch alle relevanten Aufgaben vorimplementiert um zu testen, ob das Too
 
 Was man alles mit ErrorInterval machen kann, ist in doc/index.html einsehbar
 
-## Parser
+# Parser
 
-Zusätzlich ist es nun möglich, Ausdrücke parsen und berechnen zu lassen.
-Zur Benutzung:
+Autor: [David Bohn](https://github.com/dbohn)
+
+## Benutzung
+
+Zusätzlich ist es nun möglich, Ausdrücke parsen und berechnen zu lassen. Eine GUI ist hier zu finden: http://davbohn.userpage.fu-berlin.de/physcalc/
+
+Zur Benutzung im Terminal:
 
 1. In das `dist`-Verzeichnis wechseln
 2. `node` ausführen
