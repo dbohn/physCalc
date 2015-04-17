@@ -27,7 +27,7 @@
   form.addEventListener('submit', function (ev) {
     var err, query, resError;
     ev.preventDefault();
-    query = form[0].value;
+    query = form[0].value.trim();
     if (query === '') {
       return;
     }

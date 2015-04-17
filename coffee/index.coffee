@@ -13,7 +13,7 @@ relError = result.querySelector('.rel_error')
 
 form.addEventListener('submit', (ev) ->
 	ev.preventDefault()
-	query = form[0].value
+	query = form[0].value.trim()
 	if query is '' then return
 	try
 		resError = parser.parse(query)
