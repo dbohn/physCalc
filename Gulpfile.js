@@ -6,8 +6,8 @@ elixir.config.publicDir = '';
 
 elixir(function(mix) {
 	mix.less('less/app.less', 'web/css')
+	   .pegjs('parser.pegjs', 'dist/')
 	   .coffee('', 'dist')
 	   .browserify('index.js', 'web/js', 'dist')
-	   .pegjs('parser.pegjs', 'dist/')
 	   .copy('bower_components/bootstrap/fonts','web/fonts');
 });
