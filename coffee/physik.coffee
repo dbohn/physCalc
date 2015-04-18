@@ -185,55 +185,31 @@ createFromDigitalMeasurement = (val, p, d) ->
   da += d * Math.pow(10, -decimalPlaces val.median)  
   new ErrorInterval(val.median, da).intermediateResult()
 
-aufg4 = ->
-  new ErrorInterval(52.684063, 0.0176228).endResult()
-
-aufg6 = ->
-  new ErrorInterval(34.7, 7.6).relativeError()
-
-aufg8 = ->
-  l1 = new ErrorInterval(200, 0.5)
-  l2 = new ErrorInterval(200, 0.5)
-  l3 = new ErrorInterval(104.7, 1.5)
-  l1.add(l2).add(l3).endResult()
-
-aufg9 = ->
-  s = new ErrorInterval(100,10)
-  t = new ErrorInterval(11.2,0.3)
-  s.div(t).scalar(3.6).endResult()
-
-aufg10 = ->
-  r = new ErrorInterval(1.000,0.002)
-  t0 = new ErrorInterval(20.00,0.11)
-  t1 = new ErrorInterval(2.4,0.2)
-  t0.div(t1).pow(0.5).mult(r).endResult()
-
-
-aufg11_example = ->
-  a = new ErrorInterval(62.4,0.2)
-  b = new ErrorInterval(11.2,0.2)
-  c = new ErrorInterval(9.2,0.2)
-  a.sub(b).div(c).endResult()
-
-
-aufg11 = ->
-  t = new ErrorInterval(71, 2)
-  s = new ErrorInterval(400, 5)
-  new ErrorInterval(1000,0).div(s.div(t)).endResult()
-
-aufg12 = ->
-  mu = new ErrorInterval(632.8, 0)
-  alpha = new ErrorInterval(13.4, 0.5)
-  sinAlpha = alpha.apply((val) -> Math.sin(val * (Math.PI/180)));
-  mu.div(sinAlpha).scalar(0.001).endResult()
-
+# Sinus function which can be used in 
+# the ErrorInterval.apply() function
+#
+# @param [Float] v Value
+# 
+# @return [Float] result
 sin = (v) ->
   Math.sin(v * (Math.PI / 180))
 
+# Cosinus function which can be used in 
+# the ErrorInterval.apply() function
+#
+# @param [Float] v Value
+# 
+# @return [Float] result
 cos = (v) ->
   Math.cos(v * (Math.PI / 180))
 
+# Tangens function which can be used in 
+# the ErrorInterval.apply() function
+#
+# @param [Float] v Value
+# 
+# @return [Float] result
 tan = (v) ->
   Math.tan(v * (Math.PI / 180))
 
-module.exports = {ErrorInterval, aufg4, aufg6, aufg8, aufg9, aufg10, aufg11_example, aufg11, aufg12, sin, cos, tan, createFromAnalogMeasurement, createFromDigitalMeasurement}
+module.exports = {ErrorInterval, sin, cos, tan, createFromAnalogMeasurement, createFromDigitalMeasurement}
