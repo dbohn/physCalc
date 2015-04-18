@@ -46,6 +46,18 @@
 					<h5>e=(5.57 &#177; 0.17) &delta;e=0.031</h5>
 					<p><input type="text" value="=([62.4+-0.2]-[11.2+-0.2])/[9.2+-0.2]" class="form-control" readonly="readonly"></p>
 					<h5>e=(5.6 &#177; 0.2) &delta;e=0.036</h5>
+					<hr>
+					<h4>Eingabe von Messwerten von Analog- bzw. Digitalanzeigen</h4>
+					<p>Zusätzlich zur Angabe von Fehlern anhand des Messwertes und des absoluten Fehlers, unterstützt der Rechner auch die Angabe der abgelesenen Messwerte von Analog- und Digitalanzeigen.</p>
+					<h5>Analoganzeigen</h5>
+					<p>Wir betrachten folgendes Beispiel eines Analogmultimeters: Das Multimeter hat eine <strong>Güteklasse</strong> von 1.5 und ist auf einen <strong>Messbereich</strong> von 300 mA eingestellt. Die Skala ist in 30 Sektionen eingeteilt und abgelesen wird eine Zeigerposition von (7.3 &#177; 0.1). Um diese Daten in den Rechner einzutragen muss zuerst die Zeigerposition in einen Messwert umrechnen. Dafür multipliziert man abgelesene Position und Abweichung mit Messbereich/Skala (=300/30=10). Nun kann man diese Werte eingeben. Die Syntax sieht wie folgt aus: <code>[[&lt;Median&gt; +- &lt;Radius&gt; ], &lt;Güteklasse&gt;, &lt;Messbereich&gt;]</code>. Unser Beispiel gibt also:</p>
+					<p><input type="text" value="=[[72 +- 1], 1.5, 300]" class="form-control" readonly="readonly"></p>
+					<h5>e=(72 &#177; 6) &delta;e=0.083</h5>
+					<h5>Digitalanzeigen</h5>
+					<p>Digitalanzeigen sind noch einfacher zu verwenden. Diese kommen mit der Angabe eines relativen Fehlers und eines absoluten Fehler in Form einer digit Angabe. Dies lässt sich mit dem Messwert wie folgt eintragen: <code>[&lt;Messwert&gt;, &lt;rel. Fehler&gt;, &lt;digit-Fehler&gt;]</code>.</p>
+					<p>Lesen wir z.B. von einem Messgerät mit angegebenem Nennfehler von "1% + 2d" den Wert 129.2 ab, so können wir das wie folgt eingeben:</p>
+					<p><input type="text" value="[129.2,1%,2d]" class="form-control" readonly="readonly"></p>
+					<h5>e=(129.2 &#177; 1.5) &delta;e=0.012</h5>
 				</div>
 			</div>
 		</div>
