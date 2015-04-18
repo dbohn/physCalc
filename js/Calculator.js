@@ -35,7 +35,7 @@ var Calculator = React.createClass({
 		var classes = cx({
 			'inputfield': true,
 			'has-success': this.state.errorInterval !== null,
-			'has-error': (this.state.errorInterval === null && this.state.term != '')
+			'has-error': this.state.error !== null
 		});
 		return (<div>
 				<h1>Fehlerrechner</h1>

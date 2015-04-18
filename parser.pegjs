@@ -34,7 +34,11 @@ sine
 primary
   = number
   / "(" additive:additive ")" { return additive; }
-  / "[" median:number ws "+-" ws derivation:number "]" { return parsertools.create(median, Math.abs(derivation)); }
+  / "[" median:number ws "," ws percentage:number "%" ws "," ws digit:number "d" ws "]" { return parsertools.createFromDigital(median, percentage, digit); }
+  / "[" ws measured:measurement ws "," ws grade:number ws "," ws interval:number ws "]" { return parsertools.createFromAnalogue(measured, grade, interval); }
+  / measurement
+
+measurement = "[" median:number ws "+-" ws derivation:number "]" { return parsertools.create(median, Math.abs(derivation)); }
 
 number "eine Zahl"
   = sign:"-"? digits:[0-9.]+ { return sign === null ? parseFloat(digits.join("")) : (-1)*parseFloat(digits.join("")); }

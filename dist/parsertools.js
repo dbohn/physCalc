@@ -5,7 +5,7 @@
  */
 
 (function() {
-  var Physik, add, applyOperator, convVal, create, div, endResult, mult, pow, sub;
+  var Physik, add, applyOperator, convVal, create, createFromAnalogue, createFromDigital, div, endResult, mult, pow, sub;
 
   Physik = require('./physik');
 
@@ -54,6 +54,14 @@
     return new Physik.ErrorInterval(median, derivation);
   };
 
+  createFromDigital = function(median, percentage, digit) {
+    return Physik.createFromDigitalMeasurement(convVal(median), Math.abs(percentage), Math.abs(digit));
+  };
+
+  createFromAnalogue = function(measured, grade, interval) {
+    return Physik.createFromAnalogMeasurement(convVal(measured), Math.abs(grade), Math.abs(interval));
+  };
+
   applyOperator = function(operator, operand) {
     operator = operator.toLowerCase();
     operand = convVal(operand);
@@ -90,7 +98,9 @@
     create: create,
     endResult: endResult,
     convVal: convVal,
-    applyOperator: applyOperator
+    applyOperator: applyOperator,
+    createFromDigital: createFromDigital,
+    createFromAnalogue: createFromAnalogue
   };
 
 }).call(this);

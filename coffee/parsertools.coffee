@@ -70,6 +70,12 @@ endResult = (a) ->
 create = (median, derivation) ->
 	new Physik.ErrorInterval(median, derivation)
 
+createFromDigital = (median, percentage, digit) ->
+	Physik.createFromDigitalMeasurement(convVal(median), Math.abs(percentage), Math.abs(digit))
+
+createFromAnalogue = (measured, grade, interval) ->
+	Physik.createFromAnalogMeasurement(convVal(measured), Math.abs(grade), Math.abs(interval))
+
 applyOperator = (operator, operand) ->
 	operator = operator.toLowerCase()
 	operand = convVal(operand)
@@ -84,4 +90,4 @@ applyOperator = (operator, operand) ->
 convVal = (a) ->
 	if !(a instanceof Physik.ErrorInterval) then create(a, 0) else a
 
-module.exports = {add, sub, mult, div, pow, create, endResult, convVal, applyOperator}
+module.exports = {add, sub, mult, div, pow, create, endResult, convVal, applyOperator, createFromDigital, createFromAnalogue}
