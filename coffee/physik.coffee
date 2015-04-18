@@ -58,9 +58,8 @@ class ErrorInterval
   # @return [ErrorInterval] result
   add: (o) ->
     a = @median + o.median
-    da = (@radius + o.radius).toPrecision(2)
-
-    new ErrorInterval(a.toFixed(decimalPlaces(da)), da)
+    da = @radius + o.radius
+    new ErrorInterval(a, da).intermediateResult()
 
   # Subtracts another interval
   #
@@ -68,9 +67,8 @@ class ErrorInterval
   # @return [ErrorInterval] result
   sub: (o) ->
     a = @median - o.median
-    da = (@radius + o.radius).toPrecision(2)
-
-    new ErrorInterval(a.toFixed(decimalPlaces(da)), da)
+    da = @radius + o.radius
+    new ErrorInterval(a, da).intermediateResult()
 
   # Multiplies with another interval
   #
@@ -81,7 +79,7 @@ class ErrorInterval
     rel = (@.relativeError() + o.relativeError()).toPrecision(2)
     da = (rel * a).toPrecision(2)
 
-    new ErrorInterval(a.toFixed(decimalPlaces(da)), da)
+    new ErrorInterval(a, da).intermediateResult()
 
   # Divides by another interval
   #
@@ -92,7 +90,7 @@ class ErrorInterval
     rel = (@.relativeError() + o.relativeError()).toPrecision(2)
     da = (rel * a).toPrecision(2)
 
-    new ErrorInterval(a.toFixed(decimalPlaces(da)), da)
+    new ErrorInterval(a, da).intermediateResult()
 
   # Calculates the power
   #
@@ -103,14 +101,14 @@ class ErrorInterval
     rel = (@.relativeError() * Math.abs(exp)).toPrecision(2)
     da = (rel * a).toPrecision(2)
 
-    new ErrorInterval(a.toFixed(decimalPlaces(da)), da)
+    new ErrorInterval(a, da).intermediateResult()
 
   # Multiplies the interval with a scalar
   #
   # @param [Number] c the scalar
   # @return [ErrorInterval] result
   scalar: (c) ->
-    @mult new ErrorInterval(c,0)
+    (@mult new ErrorInterval(c,0)).intermediateResult()
 
   # Applys a function @code{f} to the interval.
   # The function has to accept one parameter and
@@ -120,10 +118,8 @@ class ErrorInterval
   # @return [ErrorInterval] result
   apply: (f) ->
     k = f(@median)
-
-    dk = Math.abs(f((@median + @radius)) - k).toPrecision(2)
-
-    new ErrorInterval(k.toFixed(decimalPlaces(dk)), dk)
+    dk = Math.abs(f((@median + @radius)) - k)
+    new ErrorInterval(k, dk).intermediateResult()
 
   # Create an error interval based on this interval
   # with the precision of end results.
@@ -174,7 +170,7 @@ class ErrorInterval
 createFromAnalogMeasurement = (val, k, range) ->
   dk = (k / 100) * range
   da = val.radius
-  new ErrorInterval(val.median, (dk+da))
+  new ErrorInterval(val.median, (dk+da)).intermediateResult()
 
 # Creates an error interval based on an
 # digital measurement
@@ -187,7 +183,7 @@ createFromAnalogMeasurement = (val, k, range) ->
 createFromDigitalMeasurement = (val, p, d) ->
   da = ((p / 100) * val.median)
   da += d * Math.pow(10, -decimalPlaces val.median)  
-  new ErrorInterval(val.median, da)
+  new ErrorInterval(val.median, da).intermediateResult()
 
 aufg4 = ->
   new ErrorInterval(52.684063, 0.0176228).endResult()

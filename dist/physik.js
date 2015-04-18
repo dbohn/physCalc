@@ -39,15 +39,15 @@
     ErrorInterval.prototype.add = function(o) {
       var a, da;
       a = this.median + o.median;
-      da = (this.radius + o.radius).toPrecision(2);
-      return new ErrorInterval(a.toFixed(decimalPlaces(da)), da);
+      da = this.radius + o.radius;
+      return new ErrorInterval(a, da).intermediateResult();
     };
 
     ErrorInterval.prototype.sub = function(o) {
       var a, da;
       a = this.median - o.median;
-      da = (this.radius + o.radius).toPrecision(2);
-      return new ErrorInterval(a.toFixed(decimalPlaces(da)), da);
+      da = this.radius + o.radius;
+      return new ErrorInterval(a, da).intermediateResult();
     };
 
     ErrorInterval.prototype.mult = function(o) {
@@ -55,7 +55,7 @@
       a = this.median * o.median;
       rel = (this.relativeError() + o.relativeError()).toPrecision(2);
       da = (rel * a).toPrecision(2);
-      return new ErrorInterval(a.toFixed(decimalPlaces(da)), da);
+      return new ErrorInterval(a, da).intermediateResult();
     };
 
     ErrorInterval.prototype.div = function(o) {
@@ -63,7 +63,7 @@
       a = this.median / o.median;
       rel = (this.relativeError() + o.relativeError()).toPrecision(2);
       da = (rel * a).toPrecision(2);
-      return new ErrorInterval(a.toFixed(decimalPlaces(da)), da);
+      return new ErrorInterval(a, da).intermediateResult();
     };
 
     ErrorInterval.prototype.pow = function(exp) {
@@ -71,18 +71,18 @@
       a = Math.pow(this.median, exp);
       rel = (this.relativeError() * Math.abs(exp)).toPrecision(2);
       da = (rel * a).toPrecision(2);
-      return new ErrorInterval(a.toFixed(decimalPlaces(da)), da);
+      return new ErrorInterval(a, da).intermediateResult();
     };
 
     ErrorInterval.prototype.scalar = function(c) {
-      return this.mult(new ErrorInterval(c, 0));
+      return (this.mult(new ErrorInterval(c, 0))).intermediateResult();
     };
 
     ErrorInterval.prototype.apply = function(f) {
       var dk, k;
       k = f(this.median);
-      dk = Math.abs(f(this.median + this.radius) - k).toPrecision(2);
-      return new ErrorInterval(k.toFixed(decimalPlaces(dk)), dk);
+      dk = Math.abs(f(this.median + this.radius) - k);
+      return new ErrorInterval(k, dk).intermediateResult();
     };
 
     ErrorInterval.prototype.endResult = function() {
@@ -119,14 +119,14 @@
     var da, dk;
     dk = (k / 100) * range;
     da = val.radius;
-    return new ErrorInterval(val.median, dk + da);
+    return new ErrorInterval(val.median, dk + da).intermediateResult();
   };
 
   createFromDigitalMeasurement = function(val, p, d) {
     var da;
     da = (p / 100) * val.median;
     da += d * Math.pow(10, -decimalPlaces(val.median));
-    return new ErrorInterval(val.median, da);
+    return new ErrorInterval(val.median, da).intermediateResult();
   };
 
   aufg4 = function() {
