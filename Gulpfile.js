@@ -8,6 +8,6 @@ elixir(function(mix) {
 	mix.less('less/app.less', 'web/css')
 	   .pegjs('parser.pegjs', 'dist/')
 	   .coffee('', 'dist')
-	   .browserify('index.js', 'web/js', 'dist')
+	   .browserify('index.js', 'web/js', 'js')
 	   .copy('bower_components/bootstrap/fonts','web/fonts');
 });

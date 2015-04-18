@@ -5,5 +5,8 @@
     "pegjs": "~0.8.0",
     "vinyl-source-stream": "~1.1.0",
     "vinyl-map": "~1.0.1"
+  },
+  "dependencies": {
+    "react": "~0.13.1"
   }
 }
