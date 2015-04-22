@@ -143,20 +143,20 @@ class ErrorInterval
 
   # @return [String]
   toString: ->
-    @median+' '+@radius
+    @.getMedian()+' '+@.getRadius()
 
   # Returns the median with the same number of digits after the comma 
   # as the radius
   #
   # @return [String]
   getMedian: ->
-    @median.toFixed(decimalPlaces(@radius))
+    @median.toFixed(decimalPlaces(@.getRadius()))
 
   # Returns the radius
   #
   # @return [String]
   getRadius: ->
-    (''+@radius)
+    (''+@radius.toPrecision(2))
 
 
 # Creates an error interval based on an

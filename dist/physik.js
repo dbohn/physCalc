@@ -100,15 +100,15 @@
     };
 
     ErrorInterval.prototype.toString = function() {
-      return this.median + ' ' + this.radius;
+      return this.getMedian() + ' ' + this.getRadius();
     };
 
     ErrorInterval.prototype.getMedian = function() {
-      return this.median.toFixed(decimalPlaces(this.radius));
+      return this.median.toFixed(decimalPlaces(this.getRadius()));
     };
 
     ErrorInterval.prototype.getRadius = function() {
-      return '' + this.radius;
+      return '' + this.radius.toPrecision(2);
     };
 
     return ErrorInterval;
