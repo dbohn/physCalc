@@ -45,7 +45,6 @@ class ErrorInterval
     @median = parseFloat(median)
     @radius = parseFloat(radius)
 
-
   # returns the relative Error
   # @return [Float] relative error
   #
@@ -129,7 +128,7 @@ class ErrorInterval
     resRadius = significantDigitsCeiling(@radius, 1)
     resMedian = @median.toFixed  (decimalPlaces resRadius)
 
-    new ErrorInterval(resMedian, resRadius)
+    new EndResult(resMedian, resRadius)
 
   # Create an error interval based on this interval
   # with the precision of intermediate results.
@@ -143,7 +142,7 @@ class ErrorInterval
 
   # @return [String]
   toString: ->
-    @.getMedian()+' '+@.getRadius()
+    '['+@.getMedian()+'+-'+@.getRadius()+']'
 
   # Returns the median with the same number of digits after the comma 
   # as the radius
@@ -157,6 +156,11 @@ class ErrorInterval
   # @return [String]
   getRadius: ->
     (''+@radius.toPrecision(2))
+
+class EndResult extends ErrorInterval
+  
+  getRadius: ->
+    (''+@radius.toPrecision(1))
 
 
 # Creates an error interval based on an

@@ -1341,7 +1341,24 @@ module.exports = (function () {
 'use strict';
 
 (function () {
-  var ErrorInterval, cos, createFromAnalogMeasurement, createFromDigitalMeasurement, decimalPlaces, log10, significantDigitsCeiling, sin, tan;
+  var EndResult,
+      ErrorInterval,
+      cos,
+      createFromAnalogMeasurement,
+      createFromDigitalMeasurement,
+      decimalPlaces,
+      log10,
+      significantDigitsCeiling,
+      sin,
+      tan,
+      extend = function extend(child, parent) {
+    for (var key in parent) {
+      if (hasProp.call(parent, key)) child[key] = parent[key];
+    }function ctor() {
+      this.constructor = child;
+    }ctor.prototype = parent.prototype;child.prototype = new ctor();child.__super__ = parent.prototype;return child;
+  },
+      hasProp = ({}).hasOwnProperty;
 
   decimalPlaces = function (num) {
     var match;
@@ -1431,7 +1448,7 @@ module.exports = (function () {
       var resMedian, resRadius;
       resRadius = significantDigitsCeiling(this.radius, 1);
       resMedian = this.median.toFixed(decimalPlaces(resRadius));
-      return new ErrorInterval(resMedian, resRadius);
+      return new EndResult(resMedian, resRadius);
     };
 
     ErrorInterval.prototype.intermediateResult = function () {
@@ -1442,7 +1459,7 @@ module.exports = (function () {
     };
 
     ErrorInterval.prototype.toString = function () {
-      return this.getMedian() + ' ' + this.getRadius();
+      return '[' + this.getMedian() + '+-' + this.getRadius() + ']';
     };
 
     ErrorInterval.prototype.getMedian = function () {
@@ -1455,6 +1472,20 @@ module.exports = (function () {
 
     return ErrorInterval;
   })();
+
+  EndResult = (function (superClass) {
+    extend(EndResult, superClass);
+
+    function EndResult() {
+      return EndResult.__super__.constructor.apply(this, arguments);
+    }
+
+    EndResult.prototype.getRadius = function () {
+      return '' + this.radius.toPrecision(1);
+    };
+
+    return EndResult;
+  })(ErrorInterval);
 
   createFromAnalogMeasurement = function (val, k, range) {
     var da, dk;
