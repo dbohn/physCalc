@@ -160,6 +160,7 @@
 
   module.exports = {
     ErrorInterval: ErrorInterval,
+    log10: log10,
     sin: sin,
     cos: cos,
     tan: tan,

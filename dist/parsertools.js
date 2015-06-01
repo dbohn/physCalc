@@ -84,6 +84,12 @@
       case "atn":
         operand = operand.apply(atan);
         break;
+      case "log":
+        operand = operand.apply(Math.log);
+        break;
+      case "lgt":
+        operand = operand.apply(Physik.log10);
+        break;
       default:
         operand = operand;
     }

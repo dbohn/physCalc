@@ -87,6 +87,8 @@ applyOperator = (operator, operand) ->
 		when "asn" then operand = operand.apply(asin)
 		when "acs" then operand = operand.apply(acos)
 		when "atn" then operand = operand.apply(atan)
+		when "log" then operand = operand.apply(Math.log)
+		when "lgt" then operand = operand.apply(Physik.log10)
 		else operand = operand
 	operand
 
@@ -101,5 +103,5 @@ acos = (rad) ->
 
 atan = (rad) ->
 	Math.atan(rad)*(180/Math.PI)
-	
+
 module.exports = {add, sub, mult, div, pow, create, endResult, convVal, applyOperator, createFromDigital, createFromAnalogue}

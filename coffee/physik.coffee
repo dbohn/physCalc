@@ -216,4 +216,4 @@ cos = (v) ->
 tan = (v) ->
   Math.tan(v * (Math.PI / 180))
 
-module.exports = {ErrorInterval, sin, cos, tan, createFromAnalogMeasurement, createFromDigitalMeasurement}
+module.exports = {ErrorInterval, log10, sin, cos, tan, createFromAnalogMeasurement, createFromDigitalMeasurement}
