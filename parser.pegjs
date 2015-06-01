@@ -49,12 +49,14 @@ power = v:sine rest:(("^") sine)*
      { return rightAssoc(v, rest); }
 
 sine
-  = operator:([a-zA-Z][a-zA-Z][a-zA-Z]) ws right:value { return parsertools.applyOperator(operator.join(""), right); }
+  = operator:(letter letter letter) ws right:value { return parsertools.applyOperator(operator.join(""), right); }
   / value
 
 value = number
-      / measurement
+      / "[" median:number ws "," ws percentage:number "%" ws "," ws digit:number "d" ws "]" { return parsertools.createFromDigital(median, percentage, digit); }
+      / "[" ws measured:measurement ws "," ws grade:number ws "," ws interval:number ws "]" { return parsertools.createFromAnalogue(measured, grade, interval); }
       / "(" expression:additive ")" { return expression; }
+      / measurement
 
 measurement = "[" median:number ws "+-" ws derivation:number "]" { return parsertools.create(median, Math.abs(derivation)); }
 
