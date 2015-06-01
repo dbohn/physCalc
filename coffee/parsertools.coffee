@@ -84,10 +84,22 @@ applyOperator = (operator, operand) ->
 		when "sin" then operand = operand.apply(Physik.sin)
 		when "cos" then operand = operand.apply(Physik.cos)
 		when "tan" then operand = operand.apply(Physik.tan)
+		when "asn" then operand = operand.apply(asin)
+		when "acs" then operand = operand.apply(acos)
+		when "atn" then operand = operand.apply(atan)
 		else operand = operand
 	operand
 
 convVal = (a) ->
 	if !(a instanceof Physik.ErrorInterval) then create(a, 0) else a
 
+asin = (rad) ->
+	Math.asin(rad)*(180/Math.PI)
+
+acos = (rad) ->
+	Math.acos(rad)*(180/Math.PI)
+
+atan = (rad) ->
+	Math.atan(rad)*(180/Math.PI)
+	
 module.exports = {add, sub, mult, div, pow, create, endResult, convVal, applyOperator, createFromDigital, createFromAnalogue}

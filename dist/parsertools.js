@@ -5,7 +5,7 @@
  */
 
 (function() {
-  var Physik, add, applyOperator, convVal, create, createFromAnalogue, createFromDigital, div, endResult, mult, pow, sub;
+  var Physik, acos, add, applyOperator, asin, atan, convVal, create, createFromAnalogue, createFromDigital, div, endResult, mult, pow, sub;
 
   Physik = require('./physik');
 
@@ -75,6 +75,15 @@
       case "tan":
         operand = operand.apply(Physik.tan);
         break;
+      case "asn":
+        operand = operand.apply(asin);
+        break;
+      case "acs":
+        operand = operand.apply(acos);
+        break;
+      case "atn":
+        operand = operand.apply(atan);
+        break;
       default:
         operand = operand;
     }
@@ -87,6 +96,18 @@
     } else {
       return a;
     }
+  };
+
+  asin = function(rad) {
+    return Math.asin(rad) * (180 / Math.PI);
+  };
+
+  acos = function(rad) {
+    return Math.acos(rad) * (180 / Math.PI);
+  };
+
+  atan = function(rad) {
+    return Math.atan(rad) * (180 / Math.PI);
   };
 
   module.exports = {

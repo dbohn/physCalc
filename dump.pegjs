@@ -1,46 +1,54 @@
 {
- var parsertools = require('./parsertools');
+    var parsertools = require('./parsertools');
+    function leftAssoc(rest, val) {
+        if (!rest.length) return val;
+        var last = rest.pop();
+        var operator = last[1];
+        switch (operator){
+            case "+":
+                return parsertools.add(rest, last[0]);
+                //return leftAssoc(rest, last[0]) + val; break;
+            case "-":
+                return parsertools.sub(rest, last[0]);
+                //return leftAssoc(rest, last[0]) - val; break;
+            case "*":
+                return parsertools.mult(rest, last[0]);
+                //return leftAssoc(rest, last[0]) * val; break;
+            case "/":
+                return parsertools.div(rest, last[0]);
+                //return leftAssoc(rest, last[0]) / val; break;
+        }
+      // return {left:leftAssoc(rest, last[0]), operator:last[1], right:val};
+    }
+
+    function rightAssoc(val, rest) {
+        if (!rest.length) return val;
+        var first = rest.shift();
+        var operator = first[0];
+        switch (operator) {
+            case "^":
+                return Math.pow(val, rightAssoc(first[1], rest)); break;
+        }
+      // return {left:val, operator:first[0], right:rightAssoc(first[1], rest)};
+    }
 }
 
-start
-  = "=" ws term:additive {return parsertools.endResult(term)}
-  / additive
+start = additive
 
-additive
-  = left:multiplicative ws "+" ws right:additive { return parsertools.add(left, right); }
-  / left:multiplicative ws "-" ws right:additive { return parsertools.sub(left, right); }
-  / multiplicative
+additive = rest:(multiplicative ("+" / "-"))* v:multiplicative
+     { return leftAssoc(rest, v); }
 
-multiplicative
-  = left:power ws "*" ws right:multiplicative { return parsertools.mult(left, right); }
-  / left:power ws "/" ws right:multiplicative { return parsertools.div(left, right); }
-  / power
+multiplicative = rest:(power ("*" / "/"))* v:power
+     { return leftAssoc(rest, v); }
 
-/*power
-  = left:number ws "^" ws right:primary { return parsertools.pow(left, right); }
-  / "(" additive:additive ")" ws "^" ws right:primary { return parsertools.pow(additive, right); }
-  / "[" median:number ws "+-" ws derivation:number "]" ws "^" ws right:primary { return parsertools.pow(parsertools.create(median, derivation), right); }
-  / primary*/
+power = v:value rest:(("^") value)*
+     { return rightAssoc(v, rest); }
 
-power
-  = "sin" ws primary ws "^" ws right:sine
-  / "cos" ws primary ws "^" ws right:sine
-  / "tan" ws primary ws "^" ws right:sine
-  / primary ws "^" ws right:sine
-  / sine
-
-sine
-  = "sin" ws primary
-  / "cos" ws primary
-  / "tan" ws primary
-  / primary
-
-primary
-  = number
-  / "(" additive:additive ")" { return additive; }
-  / "[" median:number ws "+-" ws derivation:number "]" { return parsertools.create(median, derivation); }
+value = number
+      / "[" median:number ws "+-" ws derivation:number "]" { return parsertools.create(median, derivation); }
+      / "(" expression:additive ")" { return expression; }
 
 number "number"
-  = digits:[0-9.]+ { return parseFloat(digits.join("")); }
+  = sign:"-"? digits:[0-9.]+ { return sign === null ? parseFloat(digits.join("")) : (-1)*parseFloat(digits.join("")); }
 
 ws = [ \t\r\n]*
