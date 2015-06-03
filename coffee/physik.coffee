@@ -1,6 +1,15 @@
 # Calculcation of errors
 # @author Luca Keidel <info@lucakeidel.de>
 
+index = 0
+ids = 'abcdefghijklmnopqrstuvwxyz'
+
+getNewID = ->
+  if index >= ids.length
+   m = index++
+   return ids[(m % ids.length)] + Math.floor (m / ids.length)
+  return ids[index++]
+
 # Returns the number of digits after the comma
 #
 # @param [Float] num the number
@@ -32,7 +41,6 @@ significantDigitsCeiling = (num, n) ->
   shifted = Math.ceil(num * magnitude)
   shifted / magnitude
 
-
 # Represents an error interval
 class ErrorInterval
 
@@ -44,6 +52,15 @@ class ErrorInterval
   constructor: (median, radius) ->
     @median = parseFloat(median)
     @radius = parseFloat(radius)
+    
+    @calculated = false
+    if arguments.length >= 3
+      @id = arguments[2]
+      if arguments.length == 4 and arguments[3]
+        @calculated = true
+    else
+      @id = getNewID()
+    @history = []
 
   # returns the relative Error
   # @return [Float] relative error
@@ -58,7 +75,11 @@ class ErrorInterval
   add: (o) ->
     a = @median + o.median
     da = @radius + o.radius
-    new ErrorInterval(a, da).intermediateResult()
+
+    res = new ErrorInterval(a, da, @.getID()+'+'+o.getID(), true).intermediateResult()
+    res.history = @.history.concat(o.history)
+    res.history.push('Δ('+res.getID()+') = Δ'+@.getID()+' + '+'Δ'+o.getID()+' = '+res.radius)
+    res
 
   # Subtracts another interval
   #
@@ -67,7 +88,11 @@ class ErrorInterval
   sub: (o) ->
     a = @median - o.median
     da = @radius + o.radius
-    new ErrorInterval(a, da).intermediateResult()
+
+    res = new ErrorInterval(a, da,  @.getID()+'-'+o.getID() ,true).intermediateResult()
+    res.history = @.history.concat(o.history)
+    res.history.push('Δ'+res.getID()+' = Δ'+@.getID()+' + '+'Δ'+o.getID()+' = '+res.radius)
+    res
 
   # Multiplies with another interval
   #
@@ -78,7 +103,10 @@ class ErrorInterval
     rel = (@.relativeError() + o.relativeError()).toPrecision(2)
     da = (rel * a).toPrecision(2)
 
-    new ErrorInterval(a, da).intermediateResult()
+    res = new ErrorInterval(a, da, @.getID()+'*'+o.getID(), true).intermediateResult()
+    res.history = @.history.concat(o.history)
+    res.history.push('Δ'+res.getID()+' = (δ'+@.getID()+' + δ'+o.getID()+') * '+@.getID()+' * '+o.getID()+' = '+res.radius)
+    res
 
   # Divides by another interval
   #
@@ -89,7 +117,10 @@ class ErrorInterval
     rel = (@.relativeError() + o.relativeError()).toPrecision(2)
     da = (rel * a).toPrecision(2)
 
-    new ErrorInterval(a, da).intermediateResult()
+    res = new ErrorInterval(a, da, @.getID()+'/'+o.getID(), true).intermediateResult()
+    res.history = @.history.concat(o.history)
+    res.history.push('Δ'+res.getID()+' = (δ'+@.getID()+' + δ'+o.getID()+') * ('+@.getID()+' / '+o.getID()+') = '+res.radius)
+    res
 
   # Calculates the power
   #
@@ -100,7 +131,13 @@ class ErrorInterval
     rel = (@.relativeError() * Math.abs(exp)).toPrecision(2)
     da = (rel * a).toPrecision(2)
 
-    new ErrorInterval(a, da).intermediateResult()
+    expID = exp
+    if exp < 0 then expID = '('+exp+')'
+
+    res = new ErrorInterval(a, da, @.getID()+'^'+expID, true).intermediateResult()
+    res.history = @.history
+    res.history.push('Δ'+res.getID()+' = |'+exp+'| * δ'+@.getID()+' * '+@.getID()+' = '+res.radius)
+    res
 
   # Multiplies the interval with a scalar
   #
@@ -128,7 +165,9 @@ class ErrorInterval
     resRadius = significantDigitsCeiling(@radius, 1)
     resMedian = @median.toFixed  (decimalPlaces resRadius)
 
-    new EndResult(resMedian, resRadius)
+    res = new EndResult(resMedian, resRadius, @.id, @.history)
+    res.history = @.history
+    res
 
   # Create an error interval based on this interval
   # with the precision of intermediate results.
@@ -138,11 +177,15 @@ class ErrorInterval
     resRadius = @radius.toPrecision(2)
     resMedian = @median.toFixed  (decimalPlaces resRadius)
   
-    new ErrorInterval(resMedian, resRadius)    
+    new ErrorInterval(resMedian, resRadius, @id, @calculated)    
 
   # @return [String]
   toString: ->
     '['+@.getMedian()+'+-'+@.getRadius()+']'
+
+  getID: ->
+    if @.calculated then '('+@.id+')'
+    else @.id
 
   # Returns the median with the same number of digits after the comma 
   # as the radius
@@ -158,6 +201,16 @@ class ErrorInterval
     (''+@radius.toPrecision(2))
 
 class EndResult extends ErrorInterval
+
+  constructor: (median, radius, id, history) ->
+    @median = parseFloat(median)
+    @radius = parseFloat(radius)
+
+    @id = id
+    @calculated = true
+    @history = history
+    if @history.length > 0
+      @history[@history.length - 1] = @.history[@.history.length - 1].replace(/([^=\s]*)$/, @radius)
   
   getRadius: ->
     (''+@radius.toPrecision(1))
