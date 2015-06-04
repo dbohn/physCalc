@@ -60,7 +60,7 @@ class ErrorInterval
         @calculated = true
     else
       @id = getNewID()
-    @history = []
+    @steps = []
 
   # returns the relative Error
   # @return [Float] relative error
@@ -77,8 +77,8 @@ class ErrorInterval
     da = @radius + o.radius
 
     res = new ErrorInterval(a, da, @.getID()+'+'+o.getID(), true).intermediateResult()
-    res.history = @.history.concat(o.history)
-    res.history.push('Δ('+res.getID()+') = Δ'+@.getID()+' + '+'Δ'+o.getID()+' = '+res.radius)
+    res.steps = @.steps.concat(o.steps)
+    res.steps.push('Δ('+res.getID()+') = Δ'+@.getID()+' + '+'Δ'+o.getID()+' = '+res.radius)
     res
 
   # Subtracts another interval
@@ -90,8 +90,8 @@ class ErrorInterval
     da = @radius + o.radius
 
     res = new ErrorInterval(a, da,  @.getID()+'-'+o.getID() ,true).intermediateResult()
-    res.history = @.history.concat(o.history)
-    res.history.push('Δ'+res.getID()+' = Δ'+@.getID()+' + '+'Δ'+o.getID()+' = '+res.radius)
+    res.steps = @.steps.concat(o.steps)
+    res.steps.push('Δ'+res.getID()+' = Δ'+@.getID()+' + '+'Δ'+o.getID()+' = '+res.radius)
     res
 
   # Multiplies with another interval
@@ -104,8 +104,8 @@ class ErrorInterval
     da = (rel * a).toPrecision(2)
 
     res = new ErrorInterval(a, da, @.getID()+'*'+o.getID(), true).intermediateResult()
-    res.history = @.history.concat(o.history)
-    res.history.push('Δ'+res.getID()+' = (δ'+@.getID()+' + δ'+o.getID()+') * '+@.getID()+' * '+o.getID()+' = '+res.radius)
+    res.steps = @.steps.concat(o.steps)
+    res.steps.push('Δ'+res.getID()+' = (δ'+@.getID()+' + δ'+o.getID()+') * '+@.getID()+' * '+o.getID()+' = '+res.radius)
     res
 
   # Divides by another interval
@@ -118,8 +118,8 @@ class ErrorInterval
     da = (rel * a).toPrecision(2)
 
     res = new ErrorInterval(a, da, @.getID()+'/'+o.getID(), true).intermediateResult()
-    res.history = @.history.concat(o.history)
-    res.history.push('Δ'+res.getID()+' = (δ'+@.getID()+' + δ'+o.getID()+') * ('+@.getID()+' / '+o.getID()+') = '+res.radius)
+    res.steps = @.steps.concat(o.steps)
+    res.steps.push('Δ'+res.getID()+' = (δ'+@.getID()+' + δ'+o.getID()+') * ('+@.getID()+' / '+o.getID()+') = '+res.radius)
     res
 
   # Calculates the power
@@ -135,8 +135,8 @@ class ErrorInterval
     if exp < 0 then expID = '('+exp+')'
 
     res = new ErrorInterval(a, da, @.getID()+'^'+expID, true).intermediateResult()
-    res.history = @.history
-    res.history.push('Δ'+res.getID()+' = |'+exp+'| * δ'+@.getID()+' * '+@.getID()+' = '+res.radius)
+    res.steps = @.steps
+    res.steps.push('Δ'+res.getID()+' = |'+exp+'| * δ'+@.getID()+' * '+res.getID()+' = '+res.radius)
     res
 
   # Multiplies the interval with a scalar
@@ -165,8 +165,8 @@ class ErrorInterval
     resRadius = significantDigitsCeiling(@radius, 1)
     resMedian = @median.toFixed  (decimalPlaces resRadius)
 
-    res = new EndResult(resMedian, resRadius, @.id, @.history)
-    res.history = @.history
+    res = new EndResult(resMedian, resRadius, @.id, @.steps)
+    res.steps = @.steps
     res
 
   # Create an error interval based on this interval
@@ -202,15 +202,15 @@ class ErrorInterval
 
 class EndResult extends ErrorInterval
 
-  constructor: (median, radius, id, history) ->
+  constructor: (median, radius, id, steps) ->
     @median = parseFloat(median)
     @radius = parseFloat(radius)
 
     @id = id
     @calculated = true
-    @history = history
-    if @history.length > 0
-      @history[@history.length - 1] = @.history[@.history.length - 1].replace(/([^=\s]*)$/, @radius)
+    @steps = steps
+    if @steps.length > 0
+      @steps[@steps.length - 1] = @.steps[@.steps.length - 1].replace(/([^=\s]*)$/, @radius)
   
   getRadius: ->
     (''+@radius.toPrecision(1))
