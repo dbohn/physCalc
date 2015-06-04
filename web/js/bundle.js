@@ -1450,7 +1450,7 @@ module.exports = (function () {
       } else {
         this.id = getNewID();
       }
-      this.history = [];
+      this.steps = [];
     }
 
     ErrorInterval.prototype.relativeError = function () {
@@ -1461,9 +1461,9 @@ module.exports = (function () {
       var a, da, res;
       a = this.median + o.median;
       da = this.radius + o.radius;
-      res = new ErrorInterval(a, da, this.getID() + '+' + o.getID(), true).intermediateResult();
-      res.history = this.history.concat(o.history);
-      res.history.push('Δ(' + res.getID() + ') = Δ' + this.getID() + ' + ' + 'Δ' + o.getID() + ' = ' + res.radius);
+      res = new ErrorInterval(a, da, this.getID() + '+' + o.getID(), true);
+      res.steps = this.steps.concat(o.steps);
+      res.steps.push('Δ(' + res.getID() + ') = Δ' + this.getID() + ' + ' + 'Δ' + o.getID() + ' = ' + res.radius);
       return res;
     };
 
@@ -1471,9 +1471,9 @@ module.exports = (function () {
       var a, da, res;
       a = this.median - o.median;
       da = this.radius + o.radius;
-      res = new ErrorInterval(a, da, this.getID() + '-' + o.getID(), true).intermediateResult();
-      res.history = this.history.concat(o.history);
-      res.history.push('Δ' + res.getID() + ' = Δ' + this.getID() + ' + ' + 'Δ' + o.getID() + ' = ' + res.radius);
+      res = new ErrorInterval(a, da, this.getID() + '-' + o.getID(), true);
+      res.steps = this.steps.concat(o.steps);
+      res.steps.push('Δ' + res.getID() + ' = Δ' + this.getID() + ' + ' + 'Δ' + o.getID() + ' = ' + res.radius);
       return res;
     };
 
@@ -1482,9 +1482,9 @@ module.exports = (function () {
       a = this.median * o.median;
       rel = (this.relativeError() + o.relativeError()).toPrecision(2);
       da = (rel * a).toPrecision(2);
-      res = new ErrorInterval(a, da, this.getID() + '*' + o.getID(), true).intermediateResult();
-      res.history = this.history.concat(o.history);
-      res.history.push('Δ' + res.getID() + ' = (δ' + this.getID() + ' + δ' + o.getID() + ') * ' + this.getID() + ' * ' + o.getID() + ' = ' + res.radius);
+      res = new ErrorInterval(a, da, this.getID() + '*' + o.getID(), true);
+      res.steps = this.steps.concat(o.steps);
+      res.steps.push('Δ' + res.getID() + ' = (δ' + this.getID() + ' + δ' + o.getID() + ') * ' + this.getID() + ' * ' + o.getID() + ' = ' + res.radius);
       return res;
     };
 
@@ -1493,9 +1493,9 @@ module.exports = (function () {
       a = this.median / o.median;
       rel = (this.relativeError() + o.relativeError()).toPrecision(2);
       da = (rel * a).toPrecision(2);
-      res = new ErrorInterval(a, da, this.getID() + '/' + o.getID(), true).intermediateResult();
-      res.history = this.history.concat(o.history);
-      res.history.push('Δ' + res.getID() + ' = (δ' + this.getID() + ' + δ' + o.getID() + ') * (' + this.getID() + ' / ' + o.getID() + ') = ' + res.radius);
+      res = new ErrorInterval(a, da, this.getID() + '/' + o.getID(), true);
+      res.steps = this.steps.concat(o.steps);
+      res.steps.push('Δ' + res.getID() + ' = (δ' + this.getID() + ' + δ' + o.getID() + ') * (' + this.getID() + ' / ' + o.getID() + ') = ' + res.radius);
       return res;
     };
 
@@ -1508,29 +1508,30 @@ module.exports = (function () {
       if (exp < 0) {
         expID = '(' + exp + ')';
       }
-      res = new ErrorInterval(a, da, this.getID() + '^' + expID, true).intermediateResult();
-      res.history = this.history;
-      res.history.push('Δ' + res.getID() + ' = |' + exp + '| * δ' + this.getID() + ' * ' + this.getID() + ' = ' + res.radius);
+      res = new ErrorInterval(a, da, this.getID() + '^' + expID, true);
+      res.steps = this.steps;
+      res.steps.push('Δ' + res.getID() + ' = |' + exp + '| * δ' + this.getID() + ' * ' + res.getID() + ' = ' + res.radius);
       return res;
     };
 
     ErrorInterval.prototype.scalar = function (c) {
-      return this.mult(new ErrorInterval(c, 0)).intermediateResult();
+      return this.mult(new ErrorInterval(c, 0));
     };
 
     ErrorInterval.prototype.apply = function (f) {
       var dk, k;
       k = f(this.median);
+      console.log(k);
       dk = Math.abs(f(this.median + this.radius) - k);
-      return new ErrorInterval(k, dk).intermediateResult();
+      return new ErrorInterval(k, dk);
     };
 
     ErrorInterval.prototype.endResult = function () {
       var res, resMedian, resRadius;
       resRadius = significantDigitsCeiling(this.radius, 1);
       resMedian = this.median.toFixed(decimalPlaces(resRadius));
-      res = new EndResult(resMedian, resRadius, this.id, this.history);
-      res.history = this.history;
+      res = new EndResult(resMedian, resRadius, this.id, this.steps);
+      res.steps = this.steps;
       return res;
     };
 
@@ -1567,14 +1568,14 @@ module.exports = (function () {
   EndResult = (function (superClass) {
     extend(EndResult, superClass);
 
-    function EndResult(median, radius, id, history) {
+    function EndResult(median, radius, id, steps) {
       this.median = parseFloat(median);
       this.radius = parseFloat(radius);
       this.id = id;
       this.calculated = true;
-      this.history = history;
-      if (this.history.length > 0) {
-        this.history[this.history.length - 1] = this.history[this.history.length - 1].replace(/([^=\s]*)$/, this.radius);
+      this.steps = steps;
+      if (this.steps.length > 0) {
+        this.steps[this.steps.length - 1] = this.steps[this.steps.length - 1].replace(/([^=\s]*)$/, this.radius);
       }
     }
 
@@ -1589,14 +1590,14 @@ module.exports = (function () {
     var da, dk;
     dk = k / 100 * range;
     da = val.radius;
-    return new ErrorInterval(val.median, dk + da).intermediateResult();
+    return new ErrorInterval(val.median, dk + da);
   };
 
   createFromDigitalMeasurement = function (val, p, d) {
     var da;
     da = p / 100 * val.median;
     da += d * Math.pow(10, -decimalPlaces(val.median));
-    return new ErrorInterval(val.median, da).intermediateResult();
+    return new ErrorInterval(val.median, da);
   };
 
   sin = function (v) {

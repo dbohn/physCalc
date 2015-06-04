@@ -76,7 +76,7 @@ class ErrorInterval
     a = @median + o.median
     da = @radius + o.radius
 
-    res = new ErrorInterval(a, da, @.getID()+'+'+o.getID(), true).intermediateResult()
+    res = new ErrorInterval(a, da, @.getID()+'+'+o.getID(), true)
     res.steps = @.steps.concat(o.steps)
     res.steps.push('Δ('+res.getID()+') = Δ'+@.getID()+' + '+'Δ'+o.getID()+' = '+res.radius)
     res
@@ -89,7 +89,7 @@ class ErrorInterval
     a = @median - o.median
     da = @radius + o.radius
 
-    res = new ErrorInterval(a, da,  @.getID()+'-'+o.getID() ,true).intermediateResult()
+    res = new ErrorInterval(a, da,  @.getID()+'-'+o.getID() ,true)
     res.steps = @.steps.concat(o.steps)
     res.steps.push('Δ'+res.getID()+' = Δ'+@.getID()+' + '+'Δ'+o.getID()+' = '+res.radius)
     res
@@ -103,7 +103,7 @@ class ErrorInterval
     rel = (@.relativeError() + o.relativeError()).toPrecision(2)
     da = (rel * a).toPrecision(2)
 
-    res = new ErrorInterval(a, da, @.getID()+'*'+o.getID(), true).intermediateResult()
+    res = new ErrorInterval(a, da, @.getID()+'*'+o.getID(), true)
     res.steps = @.steps.concat(o.steps)
     res.steps.push('Δ'+res.getID()+' = (δ'+@.getID()+' + δ'+o.getID()+') * '+@.getID()+' * '+o.getID()+' = '+res.radius)
     res
@@ -117,7 +117,7 @@ class ErrorInterval
     rel = (@.relativeError() + o.relativeError()).toPrecision(2)
     da = (rel * a).toPrecision(2)
 
-    res = new ErrorInterval(a, da, @.getID()+'/'+o.getID(), true).intermediateResult()
+    res = new ErrorInterval(a, da, @.getID()+'/'+o.getID(), true)
     res.steps = @.steps.concat(o.steps)
     res.steps.push('Δ'+res.getID()+' = (δ'+@.getID()+' + δ'+o.getID()+') * ('+@.getID()+' / '+o.getID()+') = '+res.radius)
     res
@@ -134,7 +134,7 @@ class ErrorInterval
     expID = exp
     if exp < 0 then expID = '('+exp+')'
 
-    res = new ErrorInterval(a, da, @.getID()+'^'+expID, true).intermediateResult()
+    res = new ErrorInterval(a, da, @.getID()+'^'+expID, true)
     res.steps = @.steps
     res.steps.push('Δ'+res.getID()+' = |'+exp+'| * δ'+@.getID()+' * '+res.getID()+' = '+res.radius)
     res
@@ -144,7 +144,7 @@ class ErrorInterval
   # @param [Number] c the scalar
   # @return [ErrorInterval] result
   scalar: (c) ->
-    (@mult new ErrorInterval(c,0)).intermediateResult()
+    (@mult new ErrorInterval(c,0))
 
   # Applys a function @code{f} to the interval.
   # The function has to accept one parameter and
@@ -154,8 +154,9 @@ class ErrorInterval
   # @return [ErrorInterval] result
   apply: (f) ->
     k = f(@median)
+    console.log(k)
     dk = Math.abs(f((@median + @radius)) - k)
-    new ErrorInterval(k, dk).intermediateResult()
+    new ErrorInterval(k, dk)
 
   # Create an error interval based on this interval
   # with the precision of end results.
@@ -227,7 +228,7 @@ class EndResult extends ErrorInterval
 createFromAnalogMeasurement = (val, k, range) ->
   dk = (k / 100) * range
   da = val.radius
-  new ErrorInterval(val.median, (dk+da)).intermediateResult()
+  new ErrorInterval(val.median, (dk+da))
 
 # Creates an error interval based on an
 # digital measurement
@@ -240,7 +241,7 @@ createFromAnalogMeasurement = (val, k, range) ->
 createFromDigitalMeasurement = (val, p, d) ->
   da = ((p / 100) * val.median)
   da += d * Math.pow(10, -decimalPlaces val.median)  
-  new ErrorInterval(val.median, da).intermediateResult()
+  new ErrorInterval(val.median, da)
 
 # Sinus function which can be used in 
 # the ErrorInterval.apply() function
