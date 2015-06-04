@@ -1387,6 +1387,7 @@ module.exports = (function () {
       ids,
       index,
       log10,
+      resetIDGenerator,
       significantDigitsCeiling,
       sin,
       tan,
@@ -1435,6 +1436,10 @@ module.exports = (function () {
     magnitude = Math.pow(10, power);
     shifted = Math.ceil(num * magnitude);
     return shifted / magnitude;
+  };
+
+  resetIDGenerator = function () {
+    return index = 0;
   };
 
   ErrorInterval = (function () {
@@ -1535,13 +1540,6 @@ module.exports = (function () {
       return res;
     };
 
-    ErrorInterval.prototype.intermediateResult = function () {
-      var resMedian, resRadius;
-      resRadius = this.radius.toPrecision(2);
-      resMedian = this.median.toFixed(decimalPlaces(resRadius));
-      return new ErrorInterval(resMedian, resRadius, this.id, this.calculated);
-    };
-
     ErrorInterval.prototype.toString = function () {
       return '[' + this.getMedian() + '+-' + this.getRadius() + ']';
     };
@@ -1619,7 +1617,8 @@ module.exports = (function () {
     cos: cos,
     tan: tan,
     createFromAnalogMeasurement: createFromAnalogMeasurement,
-    createFromDigitalMeasurement: createFromDigitalMeasurement
+    createFromDigitalMeasurement: createFromDigitalMeasurement,
+    resetIDGenerator: resetIDGenerator
   };
 }).call(undefined);
 

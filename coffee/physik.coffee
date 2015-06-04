@@ -41,6 +41,9 @@ significantDigitsCeiling = (num, n) ->
   shifted = Math.ceil(num * magnitude)
   shifted / magnitude
 
+resetIDGenerator = ->
+  index = 0  
+
 # Represents an error interval
 class ErrorInterval
 
@@ -260,4 +263,4 @@ cos = (v) ->
 tan = (v) ->
   Math.tan(v * (Math.PI / 180))
 
-module.exports = {ErrorInterval, log10, sin, cos, tan, createFromAnalogMeasurement, createFromDigitalMeasurement}
+module.exports = {ErrorInterval, log10, sin, cos, tan, createFromAnalogMeasurement, createFromDigitalMeasurement, resetIDGenerator}

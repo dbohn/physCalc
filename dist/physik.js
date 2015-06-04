@@ -1,5 +1,5 @@
 (function() {
-  var EndResult, ErrorInterval, cos, createFromAnalogMeasurement, createFromDigitalMeasurement, decimalPlaces, getNewID, ids, index, log10, significantDigitsCeiling, sin, tan,
+  var EndResult, ErrorInterval, cos, createFromAnalogMeasurement, createFromDigitalMeasurement, decimalPlaces, getNewID, ids, index, log10, resetIDGenerator, significantDigitsCeiling, sin, tan,
     extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
     hasProp = {}.hasOwnProperty;
 
@@ -39,6 +39,10 @@
     magnitude = Math.pow(10, power);
     shifted = Math.ceil(num * magnitude);
     return shifted / magnitude;
+  };
+
+  resetIDGenerator = function() {
+    return index = 0;
   };
 
   ErrorInterval = (function() {
@@ -139,13 +143,6 @@
       return res;
     };
 
-    ErrorInterval.prototype.intermediateResult = function() {
-      var resMedian, resRadius;
-      resRadius = this.radius.toPrecision(2);
-      resMedian = this.median.toFixed(decimalPlaces(resRadius));
-      return new ErrorInterval(resMedian, resRadius, this.id, this.calculated);
-    };
-
     ErrorInterval.prototype.toString = function() {
       return '[' + this.getMedian() + '+-' + this.getRadius() + ']';
     };
@@ -225,7 +222,8 @@
     cos: cos,
     tan: tan,
     createFromAnalogMeasurement: createFromAnalogMeasurement,
-    createFromDigitalMeasurement: createFromDigitalMeasurement
+    createFromDigitalMeasurement: createFromDigitalMeasurement,
+    resetIDGenerator: resetIDGenerator
   };
 
 }).call(this);
