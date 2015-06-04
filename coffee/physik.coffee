@@ -170,16 +170,6 @@ class ErrorInterval
     res.steps = @.steps
     res
 
-  # Create an error interval based on this interval
-  # with the precision of intermediate results.
-  #
-  # @return [ErrorInterval] result
-  intermediateResult: ->
-    resRadius = @radius.toPrecision(2)
-    resMedian = @median.toFixed  (decimalPlaces resRadius)
-  
-    new ErrorInterval(resMedian, resRadius, @id, @calculated)    
-
   # @return [String]
   toString: ->
     '['+@.getMedian()+'+-'+@.getRadius()+']'
