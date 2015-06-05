@@ -58,7 +58,7 @@ class ErrorInterval
   add: (o) ->
     a = @median + o.median
     da = @radius + o.radius
-    new ErrorInterval(a, da).intermediateResult()
+    new ErrorInterval(a, da)
 
   # Subtracts another interval
   #
@@ -67,7 +67,7 @@ class ErrorInterval
   sub: (o) ->
     a = @median - o.median
     da = @radius + o.radius
-    new ErrorInterval(a, da).intermediateResult()
+    new ErrorInterval(a, da)
 
   # Multiplies with another interval
   #
@@ -78,7 +78,7 @@ class ErrorInterval
     rel = (@.relativeError() + o.relativeError()).toPrecision(2)
     da = (rel * a).toPrecision(2)
 
-    new ErrorInterval(a, da).intermediateResult()
+    new ErrorInterval(a, da)
 
   # Divides by another interval
   #
@@ -89,7 +89,7 @@ class ErrorInterval
     rel = (@.relativeError() + o.relativeError()).toPrecision(2)
     da = (rel * a).toPrecision(2)
 
-    new ErrorInterval(a, da).intermediateResult()
+    new ErrorInterval(a, da)
 
   # Calculates the power
   #
@@ -100,14 +100,14 @@ class ErrorInterval
     rel = (@.relativeError() * Math.abs(exp)).toPrecision(2)
     da = (rel * a).toPrecision(2)
 
-    new ErrorInterval(a, da).intermediateResult()
+    new ErrorInterval(a, da)
 
   # Multiplies the interval with a scalar
   #
   # @param [Number] c the scalar
   # @return [ErrorInterval] result
   scalar: (c) ->
-    (@mult new ErrorInterval(c,0)).intermediateResult()
+    (@mult new ErrorInterval(c,0))
 
   # Applys a function @code{f} to the interval.
   # The function has to accept one parameter and
@@ -118,7 +118,7 @@ class ErrorInterval
   apply: (f) ->
     k = f(@median)
     dk = Math.abs(f((@median + @radius)) - k)
-    new ErrorInterval(k, dk).intermediateResult()
+    new ErrorInterval(k, dk)
 
   # Create an error interval based on this interval
   # with the precision of end results.
@@ -129,16 +129,6 @@ class ErrorInterval
     resMedian = @median.toFixed  (decimalPlaces resRadius)
 
     new EndResult(resMedian, resRadius)
-
-  # Create an error interval based on this interval
-  # with the precision of intermediate results.
-  #
-  # @return [ErrorInterval] result
-  intermediateResult: ->
-    resRadius = @radius.toPrecision(2)
-    resMedian = @median.toFixed  (decimalPlaces resRadius)
-  
-    new ErrorInterval(resMedian, resRadius)    
 
   # @return [String]
   toString: ->
@@ -174,7 +164,7 @@ class EndResult extends ErrorInterval
 createFromAnalogMeasurement = (val, k, range) ->
   dk = (k / 100) * range
   da = val.radius
-  new ErrorInterval(val.median, (dk+da)).intermediateResult()
+  new ErrorInterval(val.median, (dk+da))
 
 # Creates an error interval based on an
 # digital measurement
@@ -187,7 +177,7 @@ createFromAnalogMeasurement = (val, k, range) ->
 createFromDigitalMeasurement = (val, p, d) ->
   da = ((p / 100) * val.median)
   da += d * Math.pow(10, -decimalPlaces val.median)  
-  new ErrorInterval(val.median, da).intermediateResult()
+  new ErrorInterval(val.median, da)
 
 # Sinus function which can be used in 
 # the ErrorInterval.apply() function
