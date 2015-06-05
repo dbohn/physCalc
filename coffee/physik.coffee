@@ -76,7 +76,7 @@ class ErrorInterval
   mult: (o) ->
     a = @median * o.median
     rel = (@.relativeError() + o.relativeError()).toPrecision(2)
-    da = (rel * a).toPrecision(2)
+    da = rel * a
 
     new ErrorInterval(a, da)
 
@@ -87,7 +87,7 @@ class ErrorInterval
   div: (o) ->
     a = @median / o.median
     rel = (@.relativeError() + o.relativeError()).toPrecision(2)
-    da = (rel * a).toPrecision(2)
+    da = rel * a
 
     new ErrorInterval(a, da)
 
@@ -98,7 +98,7 @@ class ErrorInterval
   pow: (exp) ->
     a = Math.pow(@median, exp)
     rel = (@.relativeError() * Math.abs(exp)).toPrecision(2)
-    da = (rel * a).toPrecision(2)
+    da = rel * a
 
     new ErrorInterval(a, da)
 
