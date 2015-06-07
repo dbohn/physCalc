@@ -45,6 +45,9 @@ class ErrorInterval
     @median = parseFloat(median)
     @radius = parseFloat(radius)
 
+    @unparsedMedian = median
+    @unparsedRadius = radius
+
   # returns the relative Error
   # @return [Float] relative error
   #
@@ -176,8 +179,10 @@ createFromAnalogMeasurement = (val, k, range) ->
 # @return [ErrorInterval] result
 createFromDigitalMeasurement = (val, p, d) ->
   da = ((p / 100) * val.median)
-  da += d * Math.pow(10, -decimalPlaces val.median)  
-  new ErrorInterval(val.median, da)
+  da += d * Math.pow(10, -decimalPlaces val.unparsedMedian) 
+  dbg = new ErrorInterval(val.median, da)
+  console.log dbg
+  dbg
 
 # Sinus function which can be used in 
 # the ErrorInterval.apply() function
@@ -206,4 +211,4 @@ cos = (v) ->
 tan = (v) ->
   Math.tan(v * (Math.PI / 180))
 
-module.exports = {ErrorInterval, log10, sin, cos, tan, createFromAnalogMeasurement, createFromDigitalMeasurement}
+module.exports = {ErrorInterval, log10, sin, cos, tan, createFromAnalogMeasurement, createFromDigitalMeasurement, decimalPlaces}
