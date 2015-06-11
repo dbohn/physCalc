@@ -65,6 +65,9 @@ class ErrorInterval
       @id = getNewID()
     @steps = []
 
+    @unparsedMedian = median
+    @unparsedRadius = radius
+
   # returns the relative Error
   # @return [Float] relative error
   #
@@ -97,6 +100,7 @@ class ErrorInterval
     res.steps.push('Δ'+res.getID()+' = Δ'+@.getID()+' + '+'Δ'+o.getID()+' = '+res.radius)
     res
 
+
   # Multiplies with another interval
   #
   # @param [ErrorInterval] o the other interval
@@ -104,12 +108,13 @@ class ErrorInterval
   mult: (o) ->
     a = @median * o.median
     rel = (@.relativeError() + o.relativeError()).toPrecision(2)
-    da = (rel * a).toPrecision(2)
+    da = rel * a
 
     res = new ErrorInterval(a, da, @.getID()+'*'+o.getID(), true)
     res.steps = @.steps.concat(o.steps)
     res.steps.push('Δ'+res.getID()+' = (δ'+@.getID()+' + δ'+o.getID()+') * '+@.getID()+' * '+o.getID()+' = '+res.radius)
     res
+
 
   # Divides by another interval
   #
@@ -118,12 +123,13 @@ class ErrorInterval
   div: (o) ->
     a = @median / o.median
     rel = (@.relativeError() + o.relativeError()).toPrecision(2)
-    da = (rel * a).toPrecision(2)
+    da = rel * a
 
     res = new ErrorInterval(a, da, @.getID()+'/'+o.getID(), true)
     res.steps = @.steps.concat(o.steps)
     res.steps.push('Δ'+res.getID()+' = (δ'+@.getID()+' + δ'+o.getID()+') * ('+@.getID()+' / '+o.getID()+') = '+res.radius)
     res
+
 
   # Calculates the power
   #
@@ -132,7 +138,7 @@ class ErrorInterval
   pow: (exp) ->
     a = Math.pow(@median, exp)
     rel = (@.relativeError() * Math.abs(exp)).toPrecision(2)
-    da = (rel * a).toPrecision(2)
+    da = rel * a
 
     expID = exp
     if exp < 0 then expID = '('+exp+')'
@@ -141,6 +147,7 @@ class ErrorInterval
     res.steps = @.steps
     res.steps.push('Δ'+res.getID()+' = |'+exp+'| * δ'+@.getID()+' * '+res.getID()+' = '+res.radius)
     res
+
 
   # Multiplies the interval with a scalar
   #
@@ -172,6 +179,7 @@ class ErrorInterval
     res = new EndResult(resMedian, resRadius, @.id, @.steps)
     res.steps = @.steps
     res
+
 
   # @return [String]
   toString: ->
@@ -233,7 +241,7 @@ createFromAnalogMeasurement = (val, k, range) ->
 # @return [ErrorInterval] result
 createFromDigitalMeasurement = (val, p, d) ->
   da = ((p / 100) * val.median)
-  da += d * Math.pow(10, -decimalPlaces val.median)  
+  da += d * Math.pow(10, -decimalPlaces val.unparsedMedian) 
   new ErrorInterval(val.median, da)
 
 # Sinus function which can be used in 
