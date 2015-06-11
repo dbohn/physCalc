@@ -88,17 +88,17 @@ applyOperator = (operator, operand) ->
 	operand = convVal(operand)
 	# TODO: throw exception for unknown operand!
 	switch operator
-		when "sin" then operand = operand.apply(Physik.sin)
-		when "cos" then operand = operand.apply(Physik.cos)
-		when "tan" then operand = operand.apply(Physik.tan)
-		when "asn" then operand = operand.apply(asin)
-		when "asin" then operand = operand.apply(asin)
-		when "acs" then operand = operand.apply(acos)
-		when "acos" then operand = operand.apply(acos)
-		when "atn" then operand = operand.apply(atan)
-		when "atan" then operand = operand.apply(atan)
-		when "ln" then operand = operand.apply(Math.log)
-		when "log" then operand = operand.apply(Physik.log10)
+		when "sin" then operand = operand.apply(Physik.sin, "sin")
+		when "cos" then operand = operand.apply(Physik.cos, "cos")
+		when "tan" then operand = operand.apply(Physik.tan, "tan")
+		when "asn" then operand = operand.apply(asin, "asin")
+		when "asin" then operand = operand.apply(asin, "asin")
+		when "acs" then operand = operand.apply(acos, "acos")
+		when "acos" then operand = operand.apply(acos, "acos")
+		when "atn" then operand = operand.apply(atan, "atan")
+		when "atan" then operand = operand.apply(atan, "atan")
+		when "ln" then operand = operand.apply(Math.log, "ln")
+		when "log" then operand = operand.apply(Physik.log10, "log")
 		else operand = operand
 	operand
 
