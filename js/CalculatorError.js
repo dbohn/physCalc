@@ -1,6 +1,7 @@
 import React from 'react/addons'
 
 import Parser from '../dist/parser'
+import Parsertools from '../dist/parsertools'
 
 var CalculatorError = React.createClass({
 
@@ -42,6 +43,11 @@ var CalculatorError = React.createClass({
 				title: 'Der Ausdruck enthält einen syntaktische Fehler an Position ' + err.column + '!',
 				info: desc
 			}
+		} else if (err instanceof Parsertools.UnknownIdentifierError) {
+			return {
+				title: 'Die Variable "' + err.identifier + '" wurde nicht definiert!',
+				info: 'Bei der Berechnung wurde ein unbekannter Bezeichner gefunden. Die Berechnung wird abgebrochen.'
+			};
 		} else if (err == 'Exponent must not have error') {
 			return {
 				title: 'Der absolute Fehler des Exponenten muss 0 sein!',

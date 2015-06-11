@@ -186,7 +186,7 @@ var VariableInput = React.createClass({
 
 	renderDigitValue(variable, i) {
 		return (
-			<div className="form-group" key={i}>
+			<div className="form-group varrow" key={i}>
 				{this.renderTypeSelector(variable, i)}
 				<div className="col-md-9 varinput">
 					<input type="text" onChange={this.changeName.bind(this, i)} className="form-control" placeholder="Name" value={variable.name} />
@@ -214,14 +214,11 @@ var VariableInput = React.createClass({
 		};
 
 		return (
-			<div className="well">
+			<div>
 				<h4>Variablen</h4>
-				
-				<div className="row">
-					<form className="form-horizontal">
-						{ this.state.variables.map(displayVar)}
-					</form>
-				</div>
+				<form className="form-horizontal">
+					{ this.state.variables.map(displayVar)}
+				</form>
 				
 				<div className="row">
 					<div className="col-md-12">

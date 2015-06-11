@@ -5,7 +5,7 @@
  */
 
 (function() {
-  var Physik, acos, add, addVariable, applyOperator, asin, atan, cleanVariables, convVal, create, createFromAnalogue, createFromDigital, createNamed, div, endResult, mult, pow, removeVariable, resetParser, resolveVariable, sub, variableExists, variables;
+  var Physik, UnknownIdentifierError, acos, add, addVariable, applyOperator, asin, atan, cleanVariables, convVal, create, createFromAnalogue, createFromDigital, createNamed, div, endResult, mult, pow, removeVariable, resetParser, resolveVariable, sub, variableExists, variables;
 
   Physik = require('./physik');
 
@@ -135,6 +135,9 @@
   };
 
   resolveVariable = function(variable) {
+    if (!variableExists(variable)) {
+      throw new UnknownIdentifierError(variable);
+    }
     return variables[variable];
   };
 
@@ -158,6 +161,14 @@
     return Physik.resetIDGenerator();
   };
 
+  UnknownIdentifierError = function(identifier) {
+    this.name = 'UnknownIdentifierError';
+    this.identifier = identifier;
+    return this.stack = (new Error).stack;
+  };
+
+  UnknownIdentifierError.prototype = new Error;
+
   module.exports = {
     add: add,
     sub: sub,
@@ -175,7 +186,8 @@
     addVariable: addVariable,
     removeVariable: removeVariable,
     resetParser: resetParser,
-    variableExists: variableExists
+    variableExists: variableExists,
+    UnknownIdentifierError: UnknownIdentifierError
   };
 
 }).call(this);

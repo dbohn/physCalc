@@ -11,14 +11,9 @@ var _Calculator = require('./Calculator');
 
 var _Calculator2 = _interopRequireDefault(_Calculator);
 
-var _VariableInput = require('./VariableInput');
+_react2['default'].render(_react2['default'].createElement(_Calculator2['default'], null), document.querySelector('.new-ui-container'));
 
-var _VariableInput2 = _interopRequireDefault(_VariableInput);
-
-_react2['default'].render(_react2['default'].createElement(_Calculator2['default'], null), document.querySelector('.top'));
-_react2['default'].render(_react2['default'].createElement(_VariableInput2['default'], null), document.querySelector('.variables'));
-
-},{"./Calculator":5,"./VariableInput":9,"react":183}],2:[function(require,module,exports){
+},{"./Calculator":5,"react":183}],2:[function(require,module,exports){
 "use strict";
 
 module.exports = (function () {
@@ -1294,7 +1289,7 @@ module.exports = (function () {
 'use strict';
 
 (function () {
-  var Physik, acos, add, addVariable, applyOperator, asin, atan, cleanVariables, convVal, create, createFromAnalogue, createFromDigital, createNamed, div, endResult, mult, pow, removeVariable, resetParser, resolveVariable, sub, variableExists, variables;
+  var Physik, UnknownIdentifierError, acos, add, addVariable, applyOperator, asin, atan, cleanVariables, convVal, create, createFromAnalogue, createFromDigital, createNamed, div, endResult, mult, pow, removeVariable, resetParser, resolveVariable, sub, variableExists, variables;
 
   Physik = require('./physik');
 
@@ -1424,6 +1419,9 @@ module.exports = (function () {
   };
 
   resolveVariable = function (variable) {
+    if (!variableExists(variable)) {
+      throw new UnknownIdentifierError(variable);
+    }
     return variables[variable];
   };
 
@@ -1447,6 +1445,14 @@ module.exports = (function () {
     return Physik.resetIDGenerator();
   };
 
+  UnknownIdentifierError = function (identifier) {
+    this.name = 'UnknownIdentifierError';
+    this.identifier = identifier;
+    return this.stack = new Error().stack;
+  };
+
+  UnknownIdentifierError.prototype = new Error();
+
   module.exports = {
     add: add,
     sub: sub,
@@ -1464,7 +1470,8 @@ module.exports = (function () {
     addVariable: addVariable,
     removeVariable: removeVariable,
     resetParser: resetParser,
-    variableExists: variableExists
+    variableExists: variableExists,
+    UnknownIdentifierError: UnknownIdentifierError
   };
 }).call(undefined);
 
@@ -1748,6 +1755,10 @@ var _CalculatorError = require('./CalculatorError');
 
 var _CalculatorError2 = _interopRequireDefault(_CalculatorError);
 
+var _VariableInput = require('./VariableInput');
+
+var _VariableInput2 = _interopRequireDefault(_VariableInput);
+
 var _distParser = require('../dist/parser');
 
 var _distParser2 = _interopRequireDefault(_distParser);
@@ -1767,7 +1778,8 @@ var Calculator = _reactAddons2['default'].createClass({
 		return {
 			term: '',
 			errorInterval: null,
-			error: null
+			error: null,
+			visibleTabIndex: 0
 		};
 	},
 
@@ -1778,35 +1790,84 @@ var Calculator = _reactAddons2['default'].createClass({
 		try {
 			var resError = _distParser2['default'].parse(newTerm);
 			resError = _distParsertools2['default'].convVal(resError);
-			this.setState({ error: null });
-			this.setState({ errorInterval: resError });
+			this.setState({
+				error: null,
+				errorInterval: resError,
+				visibleTabIndex: 1
+			});
 		} catch (err) {
-			this.setState({ errorInterval: null });
-			this.setState({ error: err });
+			this.setState({
+				errorInterval: null,
+				error: err,
+				visibleTabIndex: 1
+			});
+			// this.setState({error: err});
 		}
 	},
 
-	render: function render() {
-		var cx = _reactAddons2['default'].addons.classSet;
-		var classes = cx({
-			'inputfield': true,
-			'has-success': this.state.errorInterval !== null,
-			'has-error': this.state.error !== null
+	activateTab: function activateTab(tabId, e) {
+		this.setState({
+			visibleTabIndex: tabId
 		});
+		e.preventDefault();
+	},
+
+	render: function render() {
+		// var cx = React.addons.classSet;
+		// var classes = cx({
+		// 	'inputfield': true,
+		// 	'has-success': this.state.errorInterval !== null,
+		// 	'has-error': this.state.error !== null
+		// });
 		return _reactAddons2['default'].createElement(
 			'div',
-			null,
-			_reactAddons2['default'].createElement(
-				'h1',
-				null,
-				'Fehlerrechner'
-			),
+			{ className: 'new-ui' },
 			_reactAddons2['default'].createElement(
 				'div',
-				{ className: classes },
-				_reactAddons2['default'].createElement(_CalculatorForm2['default'], { onChange: this.onTermChange, initialTerm: this.state.term }),
-				_reactAddons2['default'].createElement(_CalculatorResult2['default'], { errorInterval: this.state.errorInterval }),
-				_reactAddons2['default'].createElement(_CalculatorError2['default'], { error: this.state.error })
+				{ className: 'col-md-12 well' },
+				_reactAddons2['default'].createElement(
+					'div',
+					{ className: this.state.error !== null ? 'has-error' : '' },
+					_reactAddons2['default'].createElement(_CalculatorForm2['default'], { onChange: this.onTermChange, initialTerm: this.state.term })
+				),
+				_reactAddons2['default'].createElement(
+					'div',
+					{ className: this.state.visibleTabIndex == 0 ? 'variables-tab tab' : 'variables-tab hide' },
+					_reactAddons2['default'].createElement(_VariableInput2['default'], null)
+				),
+				_reactAddons2['default'].createElement(
+					'div',
+					{ className: this.state.visibleTabIndex == 1 ? 'results-tab tab' : 'results-tab hide' },
+					_reactAddons2['default'].createElement(
+						'h4',
+						null,
+						'Ergebnis'
+					),
+					_reactAddons2['default'].createElement(_CalculatorResult2['default'], { errorInterval: this.state.errorInterval }),
+					_reactAddons2['default'].createElement(_CalculatorError2['default'], { error: this.state.error })
+				),
+				_reactAddons2['default'].createElement(
+					'ul',
+					{ className: 'nav nav-tabs' },
+					_reactAddons2['default'].createElement(
+						'li',
+						{ className: this.state.visibleTabIndex == 0 ? 'active' : '' },
+						_reactAddons2['default'].createElement(
+							'a',
+							{ href: '#', onClick: this.activateTab.bind(this, 0) },
+							'Variablen'
+						)
+					),
+					_reactAddons2['default'].createElement(
+						'li',
+						{ className: this.state.visibleTabIndex == 1 ? 'active' : '' },
+						_reactAddons2['default'].createElement(
+							'a',
+							{ href: '#', onClick: this.activateTab.bind(this, 1) },
+							'Ergebnis'
+						)
+					)
+				)
 			)
 		);
 	}
@@ -1815,7 +1876,7 @@ var Calculator = _reactAddons2['default'].createClass({
 exports['default'] = Calculator;
 module.exports = exports['default'];
 
-},{"../dist/parser":2,"../dist/parsertools":3,"./CalculatorError":6,"./CalculatorForm":7,"./CalculatorResult":8,"react/addons":11}],6:[function(require,module,exports){
+},{"../dist/parser":2,"../dist/parsertools":3,"./CalculatorError":6,"./CalculatorForm":7,"./CalculatorResult":8,"./VariableInput":9,"react/addons":11}],6:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1831,6 +1892,10 @@ var _reactAddons2 = _interopRequireDefault(_reactAddons);
 var _distParser = require('../dist/parser');
 
 var _distParser2 = _interopRequireDefault(_distParser);
+
+var _distParsertools = require('../dist/parsertools');
+
+var _distParsertools2 = _interopRequireDefault(_distParsertools);
 
 var CalculatorError = _reactAddons2['default'].createClass({
 	displayName: 'CalculatorError',
@@ -1872,6 +1937,11 @@ var CalculatorError = _reactAddons2['default'].createClass({
 			return {
 				title: 'Der Ausdruck enthält einen syntaktische Fehler an Position ' + err.column + '!',
 				info: desc
+			};
+		} else if (err instanceof _distParsertools2['default'].UnknownIdentifierError) {
+			return {
+				title: 'Die Variable "' + err.identifier + '" wurde nicht definiert!',
+				info: 'Bei der Berechnung wurde ein unbekannter Bezeichner gefunden. Die Berechnung wird abgebrochen.'
 			};
 		} else if (err == 'Exponent must not have error') {
 			return {
@@ -1921,7 +1991,7 @@ var CalculatorError = _reactAddons2['default'].createClass({
 exports['default'] = CalculatorError;
 module.exports = exports['default'];
 
-},{"../dist/parser":2,"react/addons":11}],7:[function(require,module,exports){
+},{"../dist/parser":2,"../dist/parsertools":3,"react/addons":11}],7:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2319,7 +2389,7 @@ var VariableInput = _reactAddons2['default'].createClass({
 	renderDigitValue: function renderDigitValue(variable, i) {
 		return _reactAddons2['default'].createElement(
 			'div',
-			{ className: 'form-group', key: i },
+			{ className: 'form-group varrow', key: i },
 			this.renderTypeSelector(variable, i),
 			_reactAddons2['default'].createElement(
 				'div',
@@ -2373,20 +2443,16 @@ var VariableInput = _reactAddons2['default'].createClass({
 
 		return _reactAddons2['default'].createElement(
 			'div',
-			{ className: 'well' },
+			null,
 			_reactAddons2['default'].createElement(
 				'h4',
 				null,
 				'Variablen'
 			),
 			_reactAddons2['default'].createElement(
-				'div',
-				{ className: 'row' },
-				_reactAddons2['default'].createElement(
-					'form',
-					{ className: 'form-horizontal' },
-					this.state.variables.map(displayVar)
-				)
+				'form',
+				{ className: 'form-horizontal' },
+				this.state.variables.map(displayVar)
 			),
 			_reactAddons2['default'].createElement(
 				'div',
