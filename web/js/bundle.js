@@ -1,17 +1,17 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 
-var _interopRequireWildcard = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React = require('react');
+var _react = require('react');
 
-var _React2 = _interopRequireWildcard(_React);
+var _react2 = _interopRequireDefault(_react);
 
 var _Calculator = require('./Calculator');
 
-var _Calculator2 = _interopRequireWildcard(_Calculator);
+var _Calculator2 = _interopRequireDefault(_Calculator);
 
-_React2['default'].render(_React2['default'].createElement(_Calculator2['default'], null), document.querySelector('.top'));
+_react2['default'].render(_react2['default'].createElement(_Calculator2['default'], null), document.querySelector('.top'));
 
 },{"./Calculator":5,"react":182}],2:[function(require,module,exports){
 "use strict";
@@ -1184,9 +1184,8 @@ module.exports = (function () {
     var parsertools = require("./parsertools");
     function leftAssoc(rest, val) {
 
-      if (!rest.length) {
-        return val;
-      }var last = rest.pop();
+      if (!rest.length) return val;
+      var last = rest.pop();
       var operator = last[2];
 
       switch (operator) {
@@ -1207,9 +1206,8 @@ module.exports = (function () {
     }
 
     function rightAssoc(val, rest) {
-      if (!rest.length) {
-        return val;
-      }var first = rest.shift();
+      if (!rest.length) return val;
+      var first = rest.shift();
       var operator = first[0];
       switch (operator) {
         case "^":
@@ -1385,7 +1383,11 @@ module.exports = (function () {
       createFromAnalogMeasurement,
       createFromDigitalMeasurement,
       decimalPlaces,
+      getNewID,
+      ids,
+      index,
       log10,
+      resetIDGenerator,
       significantDigitsCeiling,
       sin,
       tan,
@@ -1397,6 +1399,19 @@ module.exports = (function () {
     }ctor.prototype = parent.prototype;child.prototype = new ctor();child.__super__ = parent.prototype;return child;
   },
       hasProp = ({}).hasOwnProperty;
+
+  index = 0;
+
+  ids = 'abcdefghijklmnopqrstuvwxyz';
+
+  getNewID = function () {
+    var m;
+    if (index >= ids.length) {
+      m = index++;
+      return ids[m % ids.length] + Math.floor(m / ids.length);
+    }
+    return ids[index++];
+  };
 
   decimalPlaces = function (num) {
     var match;
@@ -1423,10 +1438,24 @@ module.exports = (function () {
     return shifted / magnitude;
   };
 
+  resetIDGenerator = function () {
+    return index = 0;
+  };
+
   ErrorInterval = (function () {
     function ErrorInterval(median, radius) {
       this.median = parseFloat(median);
       this.radius = parseFloat(radius);
+      this.calculated = false;
+      if (arguments.length >= 3) {
+        this.id = arguments[2];
+        if (arguments.length === 4 && arguments[3]) {
+          this.calculated = true;
+        }
+      } else {
+        this.id = getNewID();
+      }
+      this.steps = [];
     }
 
     ErrorInterval.prototype.relativeError = function () {
@@ -1434,70 +1463,93 @@ module.exports = (function () {
     };
 
     ErrorInterval.prototype.add = function (o) {
-      var a, da;
+      var a, da, res;
       a = this.median + o.median;
       da = this.radius + o.radius;
-      return new ErrorInterval(a, da).intermediateResult();
+      res = new ErrorInterval(a, da, this.getID() + '+' + o.getID(), true);
+      res.steps = this.steps.concat(o.steps);
+      res.steps.push('Δ(' + res.getID() + ') = Δ' + this.getID() + ' + ' + 'Δ' + o.getID() + ' = ' + res.radius);
+      return res;
     };
 
     ErrorInterval.prototype.sub = function (o) {
-      var a, da;
+      var a, da, res;
       a = this.median - o.median;
       da = this.radius + o.radius;
-      return new ErrorInterval(a, da).intermediateResult();
+      res = new ErrorInterval(a, da, this.getID() + '-' + o.getID(), true);
+      res.steps = this.steps.concat(o.steps);
+      res.steps.push('Δ' + res.getID() + ' = Δ' + this.getID() + ' + ' + 'Δ' + o.getID() + ' = ' + res.radius);
+      return res;
     };
 
     ErrorInterval.prototype.mult = function (o) {
-      var a, da, rel;
+      var a, da, rel, res;
       a = this.median * o.median;
       rel = (this.relativeError() + o.relativeError()).toPrecision(2);
       da = (rel * a).toPrecision(2);
-      return new ErrorInterval(a, da).intermediateResult();
+      res = new ErrorInterval(a, da, this.getID() + '*' + o.getID(), true);
+      res.steps = this.steps.concat(o.steps);
+      res.steps.push('Δ' + res.getID() + ' = (δ' + this.getID() + ' + δ' + o.getID() + ') * ' + this.getID() + ' * ' + o.getID() + ' = ' + res.radius);
+      return res;
     };
 
     ErrorInterval.prototype.div = function (o) {
-      var a, da, rel;
+      var a, da, rel, res;
       a = this.median / o.median;
       rel = (this.relativeError() + o.relativeError()).toPrecision(2);
       da = (rel * a).toPrecision(2);
-      return new ErrorInterval(a, da).intermediateResult();
+      res = new ErrorInterval(a, da, this.getID() + '/' + o.getID(), true);
+      res.steps = this.steps.concat(o.steps);
+      res.steps.push('Δ' + res.getID() + ' = (δ' + this.getID() + ' + δ' + o.getID() + ') * (' + this.getID() + ' / ' + o.getID() + ') = ' + res.radius);
+      return res;
     };
 
     ErrorInterval.prototype.pow = function (exp) {
-      var a, da, rel;
+      var a, da, expID, rel, res;
       a = Math.pow(this.median, exp);
       rel = (this.relativeError() * Math.abs(exp)).toPrecision(2);
       da = (rel * a).toPrecision(2);
-      return new ErrorInterval(a, da).intermediateResult();
+      expID = exp;
+      if (exp < 0) {
+        expID = '(' + exp + ')';
+      }
+      res = new ErrorInterval(a, da, this.getID() + '^' + expID, true);
+      res.steps = this.steps;
+      res.steps.push('Δ' + res.getID() + ' = |' + exp + '| * δ' + this.getID() + ' * ' + res.getID() + ' = ' + res.radius);
+      return res;
     };
 
     ErrorInterval.prototype.scalar = function (c) {
-      return this.mult(new ErrorInterval(c, 0)).intermediateResult();
+      return this.mult(new ErrorInterval(c, 0));
     };
 
     ErrorInterval.prototype.apply = function (f) {
       var dk, k;
       k = f(this.median);
+      console.log(k);
       dk = Math.abs(f(this.median + this.radius) - k);
-      return new ErrorInterval(k, dk).intermediateResult();
+      return new ErrorInterval(k, dk);
     };
 
     ErrorInterval.prototype.endResult = function () {
-      var resMedian, resRadius;
+      var res, resMedian, resRadius;
       resRadius = significantDigitsCeiling(this.radius, 1);
       resMedian = this.median.toFixed(decimalPlaces(resRadius));
-      return new EndResult(resMedian, resRadius);
-    };
-
-    ErrorInterval.prototype.intermediateResult = function () {
-      var resMedian, resRadius;
-      resRadius = this.radius.toPrecision(2);
-      resMedian = this.median.toFixed(decimalPlaces(resRadius));
-      return new ErrorInterval(resMedian, resRadius);
+      res = new EndResult(resMedian, resRadius, this.id, this.steps);
+      res.steps = this.steps;
+      return res;
     };
 
     ErrorInterval.prototype.toString = function () {
       return '[' + this.getMedian() + '+-' + this.getRadius() + ']';
+    };
+
+    ErrorInterval.prototype.getID = function () {
+      if (this.calculated) {
+        return '(' + this.id + ')';
+      } else {
+        return this.id;
+      }
     };
 
     ErrorInterval.prototype.getMedian = function () {
@@ -1514,8 +1566,15 @@ module.exports = (function () {
   EndResult = (function (superClass) {
     extend(EndResult, superClass);
 
-    function EndResult() {
-      return EndResult.__super__.constructor.apply(this, arguments);
+    function EndResult(median, radius, id, steps) {
+      this.median = parseFloat(median);
+      this.radius = parseFloat(radius);
+      this.id = id;
+      this.calculated = true;
+      this.steps = steps;
+      if (this.steps.length > 0) {
+        this.steps[this.steps.length - 1] = this.steps[this.steps.length - 1].replace(/([^=\s]*)$/, this.radius);
+      }
     }
 
     EndResult.prototype.getRadius = function () {
@@ -1529,14 +1588,14 @@ module.exports = (function () {
     var da, dk;
     dk = k / 100 * range;
     da = val.radius;
-    return new ErrorInterval(val.median, dk + da).intermediateResult();
+    return new ErrorInterval(val.median, dk + da);
   };
 
   createFromDigitalMeasurement = function (val, p, d) {
     var da;
     da = p / 100 * val.median;
     da += d * Math.pow(10, -decimalPlaces(val.median));
-    return new ErrorInterval(val.median, da).intermediateResult();
+    return new ErrorInterval(val.median, da);
   };
 
   sin = function (v) {
@@ -1558,7 +1617,8 @@ module.exports = (function () {
     cos: cos,
     tan: tan,
     createFromAnalogMeasurement: createFromAnalogMeasurement,
-    createFromDigitalMeasurement: createFromDigitalMeasurement
+    createFromDigitalMeasurement: createFromDigitalMeasurement,
+    resetIDGenerator: resetIDGenerator
   };
 }).call(undefined);
 
@@ -1567,37 +1627,37 @@ module.exports = (function () {
 },{}],5:[function(require,module,exports){
 'use strict';
 
-var _interopRequireWildcard = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
-
 Object.defineProperty(exports, '__esModule', {
 	value: true
 });
 
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
 var _CalculatorForm = require('./CalculatorForm');
 
-var _CalculatorForm2 = _interopRequireWildcard(_CalculatorForm);
+var _CalculatorForm2 = _interopRequireDefault(_CalculatorForm);
 
 var _CalculatorResult = require('./CalculatorResult');
 
-var _CalculatorResult2 = _interopRequireWildcard(_CalculatorResult);
+var _CalculatorResult2 = _interopRequireDefault(_CalculatorResult);
 
 var _CalculatorError = require('./CalculatorError');
 
-var _CalculatorError2 = _interopRequireWildcard(_CalculatorError);
+var _CalculatorError2 = _interopRequireDefault(_CalculatorError);
 
-var _Parser = require('../dist/parser');
+var _distParser = require('../dist/parser');
 
-var _Parser2 = _interopRequireWildcard(_Parser);
+var _distParser2 = _interopRequireDefault(_distParser);
 
-var _Parsertools = require('../dist/parsertools');
+var _distParsertools = require('../dist/parsertools');
 
-var _Parsertools2 = _interopRequireWildcard(_Parsertools);
+var _distParsertools2 = _interopRequireDefault(_distParsertools);
 
-var _React = require('react/addons');
+var _reactAddons = require('react/addons');
 
-var _React2 = _interopRequireWildcard(_React);
+var _reactAddons2 = _interopRequireDefault(_reactAddons);
 
-var Calculator = _React2['default'].createClass({
+var Calculator = _reactAddons2['default'].createClass({
 	displayName: 'Calculator',
 
 	getInitialState: function getInitialState() {
@@ -1613,8 +1673,8 @@ var Calculator = _React2['default'].createClass({
 			return;
 		}
 		try {
-			var resError = _Parser2['default'].parse(newTerm);
-			resError = _Parsertools2['default'].convVal(resError);
+			var resError = _distParser2['default'].parse(newTerm);
+			resError = _distParsertools2['default'].convVal(resError);
 			this.setState({ error: null });
 			this.setState({ errorInterval: resError });
 		} catch (err) {
@@ -1624,26 +1684,26 @@ var Calculator = _React2['default'].createClass({
 	},
 
 	render: function render() {
-		var cx = _React2['default'].addons.classSet;
+		var cx = _reactAddons2['default'].addons.classSet;
 		var classes = cx({
-			inputfield: true,
+			'inputfield': true,
 			'has-success': this.state.errorInterval !== null,
 			'has-error': this.state.error !== null
 		});
-		return _React2['default'].createElement(
+		return _reactAddons2['default'].createElement(
 			'div',
 			null,
-			_React2['default'].createElement(
+			_reactAddons2['default'].createElement(
 				'h1',
 				null,
 				'Fehlerrechner'
 			),
-			_React2['default'].createElement(
+			_reactAddons2['default'].createElement(
 				'div',
 				{ className: classes },
-				_React2['default'].createElement(_CalculatorForm2['default'], { onChange: this.onTermChange, initialTerm: this.state.term }),
-				_React2['default'].createElement(_CalculatorResult2['default'], { errorInterval: this.state.errorInterval }),
-				_React2['default'].createElement(_CalculatorError2['default'], { error: this.state.error })
+				_reactAddons2['default'].createElement(_CalculatorForm2['default'], { onChange: this.onTermChange, initialTerm: this.state.term }),
+				_reactAddons2['default'].createElement(_CalculatorResult2['default'], { errorInterval: this.state.errorInterval }),
+				_reactAddons2['default'].createElement(_CalculatorError2['default'], { error: this.state.error })
 			)
 		);
 	}
@@ -1655,21 +1715,21 @@ module.exports = exports['default'];
 },{"../dist/parser":2,"../dist/parsertools":3,"./CalculatorError":6,"./CalculatorForm":7,"./CalculatorResult":8,"react/addons":10}],6:[function(require,module,exports){
 'use strict';
 
-var _interopRequireWildcard = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
-
 Object.defineProperty(exports, '__esModule', {
 	value: true
 });
 
-var _React = require('react/addons');
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React2 = _interopRequireWildcard(_React);
+var _reactAddons = require('react/addons');
 
-var _Parser = require('../dist/parser');
+var _reactAddons2 = _interopRequireDefault(_reactAddons);
 
-var _Parser2 = _interopRequireWildcard(_Parser);
+var _distParser = require('../dist/parser');
 
-var CalculatorError = _React2['default'].createClass({
+var _distParser2 = _interopRequireDefault(_distParser);
+
+var CalculatorError = _reactAddons2['default'].createClass({
 	displayName: 'CalculatorError',
 
 	convertFound: function convertFound(found) {
@@ -1703,7 +1763,7 @@ var CalculatorError = _React2['default'].createClass({
 			};
 		}
 
-		if (err instanceof _Parser2['default'].SyntaxError) {
+		if (err instanceof _distParser2['default'].SyntaxError) {
 			console.log(err);
 			var desc = 'Es wurde ' + this.connectList(err.expected) + ' erwartet. Gefunden wurde aber ' + this.convertFound(err.found) + '.';
 			return {
@@ -1725,27 +1785,27 @@ var CalculatorError = _React2['default'].createClass({
 	},
 
 	render: function render() {
-		var cx = _React2['default'].addons.classSet;
+		var cx = _reactAddons2['default'].addons.classSet;
 		var classes = cx({
-			row: true,
-			error_container: true,
-			hide: this.props.error === null
+			'row': true,
+			'error_container': true,
+			'hide': this.props.error === null
 		});
 
 		var e = this.decodeError(this.props.error);
 
-		return _React2['default'].createElement(
+		return _reactAddons2['default'].createElement(
 			'div',
 			{ className: classes },
-			_React2['default'].createElement(
+			_reactAddons2['default'].createElement(
 				'div',
 				{ className: 'col-md-12' },
-				_React2['default'].createElement(
+				_reactAddons2['default'].createElement(
 					'h2',
 					{ className: 'error' },
 					e.title
 				),
-				_React2['default'].createElement(
+				_reactAddons2['default'].createElement(
 					'p',
 					{ className: 'infotext' },
 					e.info
@@ -1761,17 +1821,17 @@ module.exports = exports['default'];
 },{"../dist/parser":2,"react/addons":10}],7:[function(require,module,exports){
 'use strict';
 
-var _interopRequireWildcard = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
-
 Object.defineProperty(exports, '__esModule', {
 	value: true
 });
 
-var _React = require('react');
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React2 = _interopRequireWildcard(_React);
+var _react = require('react');
 
-var CalculatorForm = _React2['default'].createClass({
+var _react2 = _interopRequireDefault(_react);
+
+var CalculatorForm = _react2['default'].createClass({
 	displayName: 'CalculatorForm',
 
 	getInitialState: function getInitialState() {
@@ -1796,20 +1856,20 @@ var CalculatorForm = _React2['default'].createClass({
 	},
 
 	render: function render() {
-		return _React2['default'].createElement(
+		return _react2['default'].createElement(
 			'form',
 			{ onSubmit: this.startCalculation },
-			_React2['default'].createElement(
+			_react2['default'].createElement(
 				'div',
 				{ className: 'input-group input-group-lg' },
-				_React2['default'].createElement('input', { onChange: this.onChange, value: this.state.term, type: 'text', className: 'form-control', placeholder: 'Bitte einen Ausdruck angeben!' }),
-				_React2['default'].createElement(
+				_react2['default'].createElement('input', { onChange: this.onChange, value: this.state.term, type: 'text', className: 'form-control', placeholder: 'Bitte einen Ausdruck angeben!' }),
+				_react2['default'].createElement(
 					'span',
 					{ className: 'input-group-btn' },
-					_React2['default'].createElement(
+					_react2['default'].createElement(
 						'button',
 						{ className: 'btn btn-default', type: 'submit' },
-						_React2['default'].createElement('span', { className: 'glyphicon glyphicon-arrow-right' })
+						_react2['default'].createElement('span', { className: 'glyphicon glyphicon-arrow-right' })
 					)
 				)
 			)
@@ -1823,17 +1883,17 @@ module.exports = exports['default'];
 },{"react":182}],8:[function(require,module,exports){
 'use strict';
 
-var _interopRequireWildcard = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
-
 Object.defineProperty(exports, '__esModule', {
 	value: true
 });
 
-var _React = require('react/addons');
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React2 = _interopRequireWildcard(_React);
+var _reactAddons = require('react/addons');
 
-var CalculatorResult = _React2['default'].createClass({
+var _reactAddons2 = _interopRequireDefault(_reactAddons);
+
+var CalculatorResult = _reactAddons2['default'].createClass({
 	displayName: 'CalculatorResult',
 
 	getDefaultProps: function getDefaultProps() {
@@ -1874,20 +1934,20 @@ var CalculatorResult = _React2['default'].createClass({
 	},
 
 	render: function render() {
-		var cx = _React2['default'].addons.classSet;
+		var cx = _reactAddons2['default'].addons.classSet;
 		var classes = cx({
-			row: true,
-			result_container: true,
-			hide: !this.props.errorInterval
+			'row': true,
+			'result_container': true,
+			'hide': !this.props.errorInterval
 		});
 
-		return _React2['default'].createElement(
+		return _reactAddons2['default'].createElement(
 			'div',
 			{ className: classes },
-			_React2['default'].createElement(
+			_reactAddons2['default'].createElement(
 				'div',
 				{ className: 'col-md-12' },
-				_React2['default'].createElement(
+				_reactAddons2['default'].createElement(
 					'h2',
 					{ className: 'result' },
 					'e=(',

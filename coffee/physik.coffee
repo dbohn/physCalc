@@ -1,6 +1,15 @@
 # Calculcation of errors
 # @author Luca Keidel <info@lucakeidel.de>
 
+index = 0
+ids = 'abcdefghijklmnopqrstuvwxyz'
+
+getNewID = ->
+  if index >= ids.length
+   m = index++
+   return ids[(m % ids.length)] + Math.floor (m / ids.length)
+  return ids[index++]
+
 # Returns the number of digits after the comma
 #
 # @param [Float] num the number
@@ -32,6 +41,8 @@ significantDigitsCeiling = (num, n) ->
   shifted = Math.ceil(num * magnitude)
   shifted / magnitude
 
+resetIDGenerator = ->
+  index = 0  
 
 # Represents an error interval
 class ErrorInterval
@@ -44,6 +55,15 @@ class ErrorInterval
   constructor: (median, radius) ->
     @median = parseFloat(median)
     @radius = parseFloat(radius)
+    
+    @calculated = false
+    if arguments.length >= 3
+      @id = arguments[2]
+      if arguments.length == 4 and arguments[3]
+        @calculated = true
+    else
+      @id = getNewID()
+    @steps = []
 
     @unparsedMedian = median
     @unparsedRadius = radius
@@ -61,7 +81,11 @@ class ErrorInterval
   add: (o) ->
     a = @median + o.median
     da = @radius + o.radius
-    new ErrorInterval(a, da)
+
+    res = new ErrorInterval(a, da, @.getID()+'+'+o.getID(), true)
+    res.steps = @.steps.concat(o.steps)
+    res.steps.push('Δ('+res.getID()+') = Δ'+@.getID()+' + '+'Δ'+o.getID()+' = '+res.radius)
+    res
 
   # Subtracts another interval
   #
@@ -70,7 +94,12 @@ class ErrorInterval
   sub: (o) ->
     a = @median - o.median
     da = @radius + o.radius
-    new ErrorInterval(a, da)
+
+    res = new ErrorInterval(a, da,  @.getID()+'-'+o.getID() ,true)
+    res.steps = @.steps.concat(o.steps)
+    res.steps.push('Δ'+res.getID()+' = Δ'+@.getID()+' + '+'Δ'+o.getID()+' = '+res.radius)
+    res
+
 
   # Multiplies with another interval
   #
@@ -81,7 +110,11 @@ class ErrorInterval
     rel = (@.relativeError() + o.relativeError()).toPrecision(2)
     da = rel * a
 
-    new ErrorInterval(a, da)
+    res = new ErrorInterval(a, da, @.getID()+'*'+o.getID(), true)
+    res.steps = @.steps.concat(o.steps)
+    res.steps.push('Δ'+res.getID()+' = (δ'+@.getID()+' + δ'+o.getID()+') * '+@.getID()+' * '+o.getID()+' = '+res.radius)
+    res
+
 
   # Divides by another interval
   #
@@ -92,7 +125,11 @@ class ErrorInterval
     rel = (@.relativeError() + o.relativeError()).toPrecision(2)
     da = rel * a
 
-    new ErrorInterval(a, da)
+    res = new ErrorInterval(a, da, @.getID()+'/'+o.getID(), true)
+    res.steps = @.steps.concat(o.steps)
+    res.steps.push('Δ'+res.getID()+' = (δ'+@.getID()+' + δ'+o.getID()+') * ('+@.getID()+' / '+o.getID()+') = '+res.radius)
+    res
+
 
   # Calculates the power
   #
@@ -103,7 +140,14 @@ class ErrorInterval
     rel = (@.relativeError() * Math.abs(exp)).toPrecision(2)
     da = rel * a
 
-    new ErrorInterval(a, da)
+    expID = exp
+    if exp < 0 then expID = '('+exp+')'
+
+    res = new ErrorInterval(a, da, @.getID()+'^'+expID, true)
+    res.steps = @.steps
+    res.steps.push('Δ'+res.getID()+' = |'+exp+'| * δ'+@.getID()+' * '+res.getID()+' = '+res.radius)
+    res
+
 
   # Multiplies the interval with a scalar
   #
@@ -120,6 +164,7 @@ class ErrorInterval
   # @return [ErrorInterval] result
   apply: (f) ->
     k = f(@median)
+    console.log(k)
     dk = Math.abs(f((@median + @radius)) - k)
     new ErrorInterval(k, dk)
 
@@ -131,11 +176,18 @@ class ErrorInterval
     resRadius = significantDigitsCeiling(@radius, 1)
     resMedian = @median.toFixed  (decimalPlaces resRadius)
 
-    new EndResult(resMedian, resRadius)
+    res = new EndResult(resMedian, resRadius, @.id, @.steps)
+    res.steps = @.steps
+    res
+
 
   # @return [String]
   toString: ->
     '['+@.getMedian()+'+-'+@.getRadius()+']'
+
+  getID: ->
+    if @.calculated then '('+@.id+')'
+    else @.id
 
   # Returns the median with the same number of digits after the comma 
   # as the radius
@@ -151,6 +203,16 @@ class ErrorInterval
     (''+@radius.toPrecision(2))
 
 class EndResult extends ErrorInterval
+
+  constructor: (median, radius, id, steps) ->
+    @median = parseFloat(median)
+    @radius = parseFloat(radius)
+
+    @id = id
+    @calculated = true
+    @steps = steps
+    if @steps.length > 0
+      @steps[@steps.length - 1] = @.steps[@.steps.length - 1].replace(/([^=\s]*)$/, @radius)
   
   getRadius: ->
     (''+@radius.toPrecision(1))
@@ -180,9 +242,7 @@ createFromAnalogMeasurement = (val, k, range) ->
 createFromDigitalMeasurement = (val, p, d) ->
   da = ((p / 100) * val.median)
   da += d * Math.pow(10, -decimalPlaces val.unparsedMedian) 
-  dbg = new ErrorInterval(val.median, da)
-  console.log dbg
-  dbg
+  new ErrorInterval(val.median, da)
 
 # Sinus function which can be used in 
 # the ErrorInterval.apply() function
@@ -211,4 +271,4 @@ cos = (v) ->
 tan = (v) ->
   Math.tan(v * (Math.PI / 180))
 
-module.exports = {ErrorInterval, log10, sin, cos, tan, createFromAnalogMeasurement, createFromDigitalMeasurement, decimalPlaces}
+module.exports = {ErrorInterval, log10, sin, cos, tan, createFromAnalogMeasurement, createFromDigitalMeasurement, resetIDGenerator}
