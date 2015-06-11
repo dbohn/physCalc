@@ -223,7 +223,7 @@ var VariableInput = React.createClass({
 				<div className="row">
 					<div className="col-md-12">
 						<form onSubmit={this.addVar}>
-							<button className="btn btn-primary" type="submit">Wert hinzufügen</button>
+								<button className="btn btn-primary" type="submit">Variable hinzufügen</button>
 						</form>
 					</div>
 					

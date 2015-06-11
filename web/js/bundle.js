@@ -2466,7 +2466,7 @@ var VariableInput = _reactAddons2['default'].createClass({
 						_reactAddons2['default'].createElement(
 							'button',
 							{ className: 'btn btn-primary', type: 'submit' },
-							'Wert hinzufügen'
+							'Variable hinzufügen'
 						)
 					)
 				)
