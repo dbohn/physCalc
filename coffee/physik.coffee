@@ -187,7 +187,7 @@ class ErrorInterval
     dk = Math.abs(f((@median + @radius)) - k)
     res = new ErrorInterval(k, dk, '\\text{'+name+'} \\left('+@.getID()+'\\right)' ,true)
     res.steps = @.steps
-    res.steps.push('$\\Delta '+res.getID()+' = \\left| \\text{'+name+'}\\left('+@.getID()+' + \\Delta '+@.getID()+'\\right) - \\text{'+name+'}\\left('+@.getID()+'\\right)\\right|$')
+    res.steps.push('$\\Delta '+res.getID()+' = \\left| \\text{'+name+'}\\left('+@.getID()+' + \\Delta '+@.getID()+'\\right) - \\text{'+name+'}\\left('+@.getID()+'\\right)\\right| = '+res.radius+'$')
     res
 
   # Create an error interval based on this interval
