@@ -1461,7 +1461,11 @@ module.exports = (function () {
       createFromAnalogMeasurement,
       createFromDigitalMeasurement,
       decimalPlaces,
+      getNewID,
+      ids,
+      index,
       log10,
+      resetIDGenerator,
       significantDigitsCeiling,
       sin,
       tan,
@@ -1473,6 +1477,19 @@ module.exports = (function () {
     }ctor.prototype = parent.prototype;child.prototype = new ctor();child.__super__ = parent.prototype;return child;
   },
       hasProp = ({}).hasOwnProperty;
+
+  index = 0;
+
+  ids = 'abcdefghijklmnopqrstuvwxyz';
+
+  getNewID = function () {
+    var m;
+    if (index >= ids.length) {
+      m = index++;
+      return ids[m % ids.length] + Math.floor(m / ids.length);
+    }
+    return ids[index++];
+  };
 
   decimalPlaces = function (num) {
     var match;
@@ -1499,10 +1516,26 @@ module.exports = (function () {
     return shifted / magnitude;
   };
 
+  resetIDGenerator = function () {
+    return index = 0;
+  };
+
   ErrorInterval = (function () {
     function ErrorInterval(median, radius) {
       this.median = parseFloat(median);
       this.radius = parseFloat(radius);
+      this.calculated = false;
+      if (arguments.length >= 3) {
+        this.id = arguments[2];
+        if (arguments.length === 4 && arguments[3]) {
+          this.calculated = true;
+        }
+      } else {
+        this.id = getNewID();
+      }
+      this.steps = [];
+      this.unparsedMedian = median;
+      this.unparsedRadius = radius;
     }
 
     ErrorInterval.prototype.relativeError = function () {
@@ -1510,70 +1543,93 @@ module.exports = (function () {
     };
 
     ErrorInterval.prototype.add = function (o) {
-      var a, da;
+      var a, da, res;
       a = this.median + o.median;
       da = this.radius + o.radius;
-      return new ErrorInterval(a, da).intermediateResult();
+      res = new ErrorInterval(a, da, this.getID() + '+' + o.getID(), true);
+      res.steps = this.steps.concat(o.steps);
+      res.steps.push('Δ(' + res.getID() + ') = Δ' + this.getID() + ' + ' + 'Δ' + o.getID() + ' = ' + res.radius);
+      return res;
     };
 
     ErrorInterval.prototype.sub = function (o) {
-      var a, da;
+      var a, da, res;
       a = this.median - o.median;
       da = this.radius + o.radius;
-      return new ErrorInterval(a, da).intermediateResult();
+      res = new ErrorInterval(a, da, this.getID() + '-' + o.getID(), true);
+      res.steps = this.steps.concat(o.steps);
+      res.steps.push('Δ' + res.getID() + ' = Δ' + this.getID() + ' + ' + 'Δ' + o.getID() + ' = ' + res.radius);
+      return res;
     };
 
     ErrorInterval.prototype.mult = function (o) {
-      var a, da, rel;
+      var a, da, rel, res;
       a = this.median * o.median;
       rel = (this.relativeError() + o.relativeError()).toPrecision(2);
-      da = (rel * a).toPrecision(2);
-      return new ErrorInterval(a, da).intermediateResult();
+      da = rel * a;
+      res = new ErrorInterval(a, da, this.getID() + '*' + o.getID(), true);
+      res.steps = this.steps.concat(o.steps);
+      res.steps.push('Δ' + res.getID() + ' = (δ' + this.getID() + ' + δ' + o.getID() + ') * ' + this.getID() + ' * ' + o.getID() + ' = ' + res.radius);
+      return res;
     };
 
     ErrorInterval.prototype.div = function (o) {
-      var a, da, rel;
+      var a, da, rel, res;
       a = this.median / o.median;
       rel = (this.relativeError() + o.relativeError()).toPrecision(2);
-      da = (rel * a).toPrecision(2);
-      return new ErrorInterval(a, da).intermediateResult();
+      da = rel * a;
+      res = new ErrorInterval(a, da, this.getID() + '/' + o.getID(), true);
+      res.steps = this.steps.concat(o.steps);
+      res.steps.push('Δ' + res.getID() + ' = (δ' + this.getID() + ' + δ' + o.getID() + ') * (' + this.getID() + ' / ' + o.getID() + ') = ' + res.radius);
+      return res;
     };
 
     ErrorInterval.prototype.pow = function (exp) {
-      var a, da, rel;
+      var a, da, expID, rel, res;
       a = Math.pow(this.median, exp);
       rel = (this.relativeError() * Math.abs(exp)).toPrecision(2);
-      da = (rel * a).toPrecision(2);
-      return new ErrorInterval(a, da).intermediateResult();
+      da = rel * a;
+      expID = exp;
+      if (exp < 0) {
+        expID = '(' + exp + ')';
+      }
+      res = new ErrorInterval(a, da, this.getID() + '^' + expID, true);
+      res.steps = this.steps;
+      res.steps.push('Δ' + res.getID() + ' = |' + exp + '| * δ' + this.getID() + ' * ' + res.getID() + ' = ' + res.radius);
+      return res;
     };
 
     ErrorInterval.prototype.scalar = function (c) {
-      return this.mult(new ErrorInterval(c, 0)).intermediateResult();
+      return this.mult(new ErrorInterval(c, 0));
     };
 
     ErrorInterval.prototype.apply = function (f) {
       var dk, k;
       k = f(this.median);
+      console.log(k);
       dk = Math.abs(f(this.median + this.radius) - k);
-      return new ErrorInterval(k, dk).intermediateResult();
+      return new ErrorInterval(k, dk);
     };
 
     ErrorInterval.prototype.endResult = function () {
-      var resMedian, resRadius;
+      var res, resMedian, resRadius;
       resRadius = significantDigitsCeiling(this.radius, 1);
       resMedian = this.median.toFixed(decimalPlaces(resRadius));
-      return new EndResult(resMedian, resRadius);
-    };
-
-    ErrorInterval.prototype.intermediateResult = function () {
-      var resMedian, resRadius;
-      resRadius = this.radius.toPrecision(2);
-      resMedian = this.median.toFixed(decimalPlaces(resRadius));
-      return new ErrorInterval(resMedian, resRadius);
+      res = new EndResult(resMedian, resRadius, this.id, this.steps);
+      res.steps = this.steps;
+      return res;
     };
 
     ErrorInterval.prototype.toString = function () {
       return '[' + this.getMedian() + '+-' + this.getRadius() + ']';
+    };
+
+    ErrorInterval.prototype.getID = function () {
+      if (this.calculated) {
+        return '(' + this.id + ')';
+      } else {
+        return this.id;
+      }
     };
 
     ErrorInterval.prototype.getMedian = function () {
@@ -1590,8 +1646,15 @@ module.exports = (function () {
   EndResult = (function (superClass) {
     extend(EndResult, superClass);
 
-    function EndResult() {
-      return EndResult.__super__.constructor.apply(this, arguments);
+    function EndResult(median, radius, id, steps) {
+      this.median = parseFloat(median);
+      this.radius = parseFloat(radius);
+      this.id = id;
+      this.calculated = true;
+      this.steps = steps;
+      if (this.steps.length > 0) {
+        this.steps[this.steps.length - 1] = this.steps[this.steps.length - 1].replace(/([^=\s]*)$/, this.radius);
+      }
     }
 
     EndResult.prototype.getRadius = function () {
@@ -1605,14 +1668,14 @@ module.exports = (function () {
     var da, dk;
     dk = k / 100 * range;
     da = val.radius;
-    return new ErrorInterval(val.median, dk + da).intermediateResult();
+    return new ErrorInterval(val.median, dk + da);
   };
 
   createFromDigitalMeasurement = function (val, p, d) {
     var da;
     da = p / 100 * val.median;
-    da += d * Math.pow(10, -decimalPlaces(val.median));
-    return new ErrorInterval(val.median, da).intermediateResult();
+    da += d * Math.pow(10, -decimalPlaces(val.unparsedMedian));
+    return new ErrorInterval(val.median, da);
   };
 
   sin = function (v) {
@@ -1634,7 +1697,8 @@ module.exports = (function () {
     cos: cos,
     tan: tan,
     createFromAnalogMeasurement: createFromAnalogMeasurement,
-    createFromDigitalMeasurement: createFromDigitalMeasurement
+    createFromDigitalMeasurement: createFromDigitalMeasurement,
+    resetIDGenerator: resetIDGenerator
   };
 }).call(undefined);
 
