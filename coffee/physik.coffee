@@ -212,7 +212,7 @@ class EndResult extends ErrorInterval
     @calculated = true
     @steps = steps
     if @steps.length > 0
-      @steps[@steps.length - 1] = @.steps[@.steps.length - 1].replace(/([^=\s]*)$/, @radius)
+      @steps[@steps.length - 1] = @.steps[@.steps.length - 1].replace(/([^=\s]*)$/, @radius) + '$'
   
   getRadius: ->
     (''+@radius.toPrecision(1))

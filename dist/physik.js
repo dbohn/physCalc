@@ -179,7 +179,7 @@
       this.calculated = true;
       this.steps = steps;
       if (this.steps.length > 0) {
-        this.steps[this.steps.length - 1] = this.steps[this.steps.length - 1].replace(/([^=\s]*)$/, this.radius);
+        this.steps[this.steps.length - 1] = this.steps[this.steps.length - 1].replace(/([^=\s]*)$/, this.radius) + '$';
       }
     }
 
