@@ -76,6 +76,8 @@ createNamed = (median, derivation, name) ->
 	new Physik.ErrorInterval(median, derivation, name)
 
 createFromDigital = (median, percentage, digit) ->
+	if arguments.length >= 4
+		return Physik.createFromDigitalMeasurement(convVal(median), Math.abs(percentage), Math.abs(digit), arguments[3])
 	Physik.createFromDigitalMeasurement(convVal(median), Math.abs(percentage), Math.abs(digit))
 
 createFromAnalogue = (measured, grade, interval) ->

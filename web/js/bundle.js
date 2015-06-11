@@ -1350,6 +1350,9 @@ module.exports = (function () {
   };
 
   createFromDigital = function (median, percentage, digit) {
+    if (arguments.length >= 4) {
+      return Physik.createFromDigitalMeasurement(convVal(median), Math.abs(percentage), Math.abs(digit), arguments[3]);
+    }
     return Physik.createFromDigitalMeasurement(convVal(median), Math.abs(percentage), Math.abs(digit));
   };
 
@@ -1691,7 +1694,11 @@ module.exports = (function () {
     var da;
     da = p / 100 * val.median;
     da += d * Math.pow(10, -decimalPlaces(val.unparsedMedian));
-    return new ErrorInterval(val.median, da);
+    if (arguments.length >= 4) {
+      return new ErrorInterval(val.median, da, arguments[3]);
+    } else {
+      return new ErrorInterval(val.median, da);
+    }
   };
 
   sin = function (v) {
@@ -2034,10 +2041,10 @@ var CalculatorResult = _reactAddons2['default'].createClass({
 			return '';
 		}
 
-		return this.props.errorInterval.steps.map(function (el) {
+		return this.props.errorInterval.steps.map(function (el, i) {
 			return _reactAddons2['default'].createElement(
 				'li',
-				null,
+				{ key: i },
 				el
 			);
 		});
@@ -2191,71 +2198,179 @@ var VariableInput = _reactAddons2['default'].createClass({
 		this.updateOrAddVar(cpy[i]);
 	},
 
+	changePercentage: function changePercentage(i, e) {
+		var newPercentage = e.target.value;
+		var cpy = this.state.variables.slice();
+
+		cpy[i].percentage = newPercentage;
+
+		this.setState({
+			variables: cpy
+		});
+
+		this.updateOrAddVar(cpy[i]);
+	},
+
+	changeDigit: function changeDigit(i, e) {
+		var newDigit = e.target.value;
+		var cpy = this.state.variables.slice();
+
+		cpy[i].digit = newDigit;
+
+		this.setState({
+			variables: cpy
+		});
+
+		this.updateOrAddVar(cpy[i]);
+	},
+
 	updateOrAddVar: function updateOrAddVar(varfield) {
 		var name = varfield.name,
-		    median = varfield.median,
-		    radiand = varfield.radius;
-		_distParsertools2['default'].addVariable(name, _distParsertools2['default'].createNamed(median, radiand, name));
+		    median = varfield.median;
+		if (varfield.type == 'errorvalue') {
+			var radiand = varfield.radius;
+			_distParsertools2['default'].addVariable(name, _distParsertools2['default'].createNamed(median, radiand, name));
+		} else if (varfield.type == 'digitvalue') {
+			var converted = _distParsertools2['default'].createFromDigital(median, varfield.percentage, varfield.digit, name);
+			_distParsertools2['default'].addVariable(name, converted);
+		}
+	},
+
+	changeType: function changeType(variable, i, e) {
+		var newType = e.target.value;
+		var cpy = this.state.variables.slice();
+
+		var newEntry = {
+			name: cpy[i].name,
+			type: newType
+		};
+
+		if (newType == 'digitvalue') {
+			newEntry.median = 0;
+			newEntry.percentage = 0;
+			newEntry.digit = 0;
+		} else {
+			newEntry.median = 0;
+			newEntry.radius = 0;
+		}
+
+		cpy[i] = newEntry;
+
+		this.setState({ variables: cpy });
+
+		this.updateOrAddVar(cpy[i]);
+	},
+
+	renderTypeSelector: function renderTypeSelector(variable, i) {
+		return _reactAddons2['default'].createElement(
+			'div',
+			{ className: 'col-md-2' },
+			_reactAddons2['default'].createElement(
+				'select',
+				{ className: 'form-control', onChange: this.changeType.bind(this, variable, i), defaultValue: variable.type },
+				_reactAddons2['default'].createElement(
+					'option',
+					{ value: 'errorvalue' },
+					'Fehlerwert'
+				),
+				_reactAddons2['default'].createElement(
+					'option',
+					{ value: 'digitvalue' },
+					'Digitalwert'
+				)
+			)
+		);
+	},
+
+	renderErrorValue: function renderErrorValue(variable, i) {
+		return _reactAddons2['default'].createElement(
+			'div',
+			{ className: 'form-group varrow', key: i },
+			this.renderTypeSelector(variable, i),
+			_reactAddons2['default'].createElement(
+				'div',
+				{ className: 'col-md-9 varinput' },
+				_reactAddons2['default'].createElement('input', { type: 'text', onChange: this.changeName.bind(this, i), className: 'form-control', placeholder: 'Name', value: variable.name }),
+				_reactAddons2['default'].createElement(
+					'span',
+					{ className: 'separator' },
+					'='
+				),
+				_reactAddons2['default'].createElement('input', { type: 'text', onChange: this.changeMedian.bind(this, i), className: 'form-control', placeholder: 'Median', value: variable.median }),
+				_reactAddons2['default'].createElement(
+					'span',
+					{ className: 'separator' },
+					'±'
+				),
+				_reactAddons2['default'].createElement('input', { type: 'text', onChange: this.changeRadius.bind(this, i), className: 'form-control', placeholder: 'Radius', value: variable.radius })
+			),
+			_reactAddons2['default'].createElement(
+				'div',
+				{ className: 'col-md-1' },
+				_reactAddons2['default'].createElement(
+					'button',
+					{ className: 'btn btn-danger', onClick: this.removeVar.bind(this, i) },
+					_reactAddons2['default'].createElement('span', { className: 'glyphicon glyphicon-minus' })
+				)
+			)
+		);
+	},
+
+	renderDigitValue: function renderDigitValue(variable, i) {
+		return _reactAddons2['default'].createElement(
+			'div',
+			{ className: 'form-group', key: i },
+			this.renderTypeSelector(variable, i),
+			_reactAddons2['default'].createElement(
+				'div',
+				{ className: 'col-md-9 varinput' },
+				_reactAddons2['default'].createElement('input', { type: 'text', onChange: this.changeName.bind(this, i), className: 'form-control', placeholder: 'Name', value: variable.name }),
+				_reactAddons2['default'].createElement(
+					'span',
+					{ className: 'separator' },
+					'='
+				),
+				_reactAddons2['default'].createElement('input', { type: 'text', onChange: this.changeMedian.bind(this, i), className: 'form-control', placeholder: 'Messwert', value: variable.median }),
+				_reactAddons2['default'].createElement(
+					'span',
+					{ className: 'separator' },
+					','
+				),
+				_reactAddons2['default'].createElement('input', { type: 'text', onChange: this.changePercentage.bind(this, i), className: 'form-control', placeholder: 'Relativer Fehler', value: variable.percentage }),
+				_reactAddons2['default'].createElement(
+					'span',
+					{ className: 'separator' },
+					'%'
+				),
+				_reactAddons2['default'].createElement('input', { type: 'text', onChange: this.changeDigit.bind(this, i), className: 'form-control', placeholder: 'Digit Fehler', value: variable.digit }),
+				_reactAddons2['default'].createElement(
+					'span',
+					{ className: 'separator' },
+					'd'
+				)
+			),
+			_reactAddons2['default'].createElement(
+				'div',
+				{ className: 'col-md-1' },
+				_reactAddons2['default'].createElement(
+					'button',
+					{ className: 'btn btn-danger', onClick: this.removeVar.bind(this, i) },
+					_reactAddons2['default'].createElement('span', { className: 'glyphicon glyphicon-minus' })
+				)
+			)
+		);
 	},
 
 	render: function render() {
 		var _this = this;
 
 		var displayVar = function displayVar(variable, i) {
-			return _reactAddons2['default'].createElement(
-				'div',
-				{ className: 'form-group', key: i },
-				_reactAddons2['default'].createElement(
-					'div',
-					{ className: 'col-md-2' },
-					_reactAddons2['default'].createElement(
-						'select',
-						{ className: 'form-control', defaultValue: variable.type },
-						_reactAddons2['default'].createElement(
-							'option',
-							{ value: 'errorvalue' },
-							'Fehlerwert'
-						),
-						_reactAddons2['default'].createElement(
-							'option',
-							{ value: 'digitvalue' },
-							'Digitalwert'
-						),
-						_reactAddons2['default'].createElement(
-							'option',
-							{ value: 'analogvalue' },
-							'Analogwert'
-						)
-					)
-				),
-				_reactAddons2['default'].createElement(
-					'div',
-					{ className: 'col-md-9 varinput' },
-					_reactAddons2['default'].createElement('input', { type: 'text', onChange: _this.changeName.bind(_this, i), className: 'form-control', placeholder: 'Name', value: variable.name }),
-					_reactAddons2['default'].createElement(
-						'span',
-						{ className: 'separator' },
-						'='
-					),
-					_reactAddons2['default'].createElement('input', { type: 'text', onChange: _this.changeMedian.bind(_this, i), className: 'form-control', placeholder: 'Median', value: variable.median }),
-					_reactAddons2['default'].createElement(
-						'span',
-						{ className: 'separator' },
-						'±'
-					),
-					_reactAddons2['default'].createElement('input', { type: 'text', onChange: _this.changeRadius.bind(_this, i), className: 'form-control', placeholder: 'Radius', value: variable.radius })
-				),
-				_reactAddons2['default'].createElement(
-					'div',
-					{ className: 'col-md-1' },
-					_reactAddons2['default'].createElement(
-						'button',
-						{ className: 'btn btn-danger', onClick: _this.removeVar.bind(_this, i) },
-						_reactAddons2['default'].createElement('span', { className: 'glyphicon glyphicon-minus' })
-					)
-				)
-			);
+			if (variable.type == 'digitvalue') {
+				return _this.renderDigitValue(variable, i);
+			}
+			return _this.renderErrorValue(variable, i);
 		};
+
 		return _reactAddons2['default'].createElement(
 			'div',
 			{ className: 'well' },

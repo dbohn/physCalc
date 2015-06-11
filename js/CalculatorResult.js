@@ -38,8 +38,8 @@ var CalculatorResult = React.createClass({
 			return '';
 		}
 
-		return this.props.errorInterval.steps.map(function (el) {
-			return <li>{el}</li>;
+		return this.props.errorInterval.steps.map(function (el, i) {
+			return <li key={i}>{el}</li>;
 		});
 	},
 

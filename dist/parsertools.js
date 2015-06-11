@@ -61,6 +61,9 @@
   };
 
   createFromDigital = function(median, percentage, digit) {
+    if (arguments.length >= 4) {
+      return Physik.createFromDigitalMeasurement(convVal(median), Math.abs(percentage), Math.abs(digit), arguments[3]);
+    }
     return Physik.createFromDigitalMeasurement(convVal(median), Math.abs(percentage), Math.abs(digit));
   };
 

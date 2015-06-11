@@ -202,7 +202,11 @@
     var da;
     da = (p / 100) * val.median;
     da += d * Math.pow(10, -decimalPlaces(val.unparsedMedian));
-    return new ErrorInterval(val.median, da);
+    if (arguments.length >= 4) {
+      return new ErrorInterval(val.median, da, arguments[3]);
+    } else {
+      return new ErrorInterval(val.median, da);
+    }
   };
 
   sin = function(v) {

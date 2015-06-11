@@ -73,10 +73,14 @@
 	}
 }
 
+.varrow {
+	margin: 0 auto !important;
+}
+
 .varinput {
+	display: flex;
+	width: 70%;
 	input {
-		width: 30%;
-		display: inline;
 		border-radius: 0;
 		border-left: none;
 		border-right: none;
@@ -86,11 +90,7 @@
 			border-top-left-radius: @border-radius-base;
 			border-bottom-left-radius: @border-radius-base;
 		}
-		&:last-child {
-			border-right: 1px solid #ccc;
-			border-top-right-radius: @border-radius-base;
-			border-bottom-right-radius: @border-radius-base;
-		}
+		
 	}
 
 	.separator {
@@ -103,6 +103,13 @@
 		padding: 7px 12px 8px 12px;
 		border-top: 1px solid #ccc;
 		border-bottom: 1px solid #ccc;
+		text-align: center;
+	}
+
+	input:last-child, .separator:last-child {
+		border-right: 1px solid #ccc;
+		border-top-right-radius: @border-radius-base;
+		border-bottom-right-radius: @border-radius-base;
 	}
 }
 
