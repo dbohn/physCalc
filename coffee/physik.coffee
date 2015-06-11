@@ -112,7 +112,7 @@ class ErrorInterval
 
     res = new ErrorInterval(a, da, @.getID()+' \\cdot '+o.getID(), true)
     res.steps = @.steps.concat(o.steps)
-    res.steps.push('$\\Delta '+res.getID()+' = \\(\\delta '+@.getID()+' + \\delta '+o.getID()+'\\) \\cdot '+@.getID()+' \\cdot '+o.getID()+' = '+res.radius+'$')
+    res.steps.push('$\\Delta '+res.getID()+' = \\left(\\delta '+@.getID()+' + \\delta '+o.getID()+'\\right) \\cdot '+@.getID()+' \\cdot '+o.getID()+' = '+res.radius+'$')
     res
 
 
@@ -127,7 +127,7 @@ class ErrorInterval
 
     res = new ErrorInterval(a, da, '\\frac{'+@.getID()+'}{'+o.getID()+'}', true)
     res.steps = @.steps.concat(o.steps)
-    res.steps.push('$\\Delta '+res.getID()+' = \\(\\delta '+@.getID()+' + \\delta '+o.getID()+'\\) \\cdot \\(\\frac{'+@.getID()+'}{'+o.getID()+'}\\) = '+res.radius+'$')
+    res.steps.push('$\\Delta '+res.getID()+' = \\left(\\delta '+@.getID()+' + \\delta '+o.getID()+'\\right) \\cdot \\left(\\frac{'+@.getID()+'}{'+o.getID()+'}\\right) = '+res.radius+'$')
     res
 
 
@@ -141,7 +141,7 @@ class ErrorInterval
     da = rel * a
 
     expID = exp
-    if exp < 0 then expID = '\\('+exp+'\\)'
+    if exp < 0 then expID = '\\left('+exp+'\\right)'
 
     res = new ErrorInterval(a, da, @.getID()+'^'+expID, true)
     res.steps = @.steps
@@ -186,7 +186,7 @@ class ErrorInterval
     '\\['+@.getMedian()+'\\pm'+@.getRadius()+'\\]'
 
   getID: ->
-    if @.calculated then '\\('+@.id+'\\)'
+    if @.calculated then '\\left('+@.id+'\\right)'
     else @.id
 
   # Returns the median with the same number of digits after the comma 

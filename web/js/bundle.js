@@ -1574,7 +1574,7 @@ module.exports = (function () {
       da = this.radius + o.radius;
       res = new ErrorInterval(a, da, this.getID() + '+' + o.getID(), true);
       res.steps = this.steps.concat(o.steps);
-      res.steps.push('Δ(' + res.getID() + ') = Δ' + this.getID() + ' + ' + 'Δ' + o.getID() + ' = ' + res.radius);
+      res.steps.push('$\\Delta ' + res.getID() + ' = \\Delta ' + this.getID() + ' + ' + '\\Delta ' + o.getID() + ' = ' + res.radius + '$');
       return res;
     };
 
@@ -1584,7 +1584,7 @@ module.exports = (function () {
       da = this.radius + o.radius;
       res = new ErrorInterval(a, da, this.getID() + '-' + o.getID(), true);
       res.steps = this.steps.concat(o.steps);
-      res.steps.push('Δ' + res.getID() + ' = Δ' + this.getID() + ' + ' + 'Δ' + o.getID() + ' = ' + res.radius);
+      res.steps.push('$\\Delta ' + res.getID() + ' = \\Delta ' + this.getID() + ' + ' + '\\Delta ' + o.getID() + ' = ' + res.radius + '$');
       return res;
     };
 
@@ -1593,9 +1593,9 @@ module.exports = (function () {
       a = this.median * o.median;
       rel = (this.relativeError() + o.relativeError()).toPrecision(2);
       da = rel * a;
-      res = new ErrorInterval(a, da, this.getID() + '*' + o.getID(), true);
+      res = new ErrorInterval(a, da, this.getID() + ' \\cdot ' + o.getID(), true);
       res.steps = this.steps.concat(o.steps);
-      res.steps.push('Δ' + res.getID() + ' = (δ' + this.getID() + ' + δ' + o.getID() + ') * ' + this.getID() + ' * ' + o.getID() + ' = ' + res.radius);
+      res.steps.push('$\\Delta ' + res.getID() + ' = \\left(\\delta ' + this.getID() + ' + \\delta ' + o.getID() + '\\right) \\cdot ' + this.getID() + ' \\cdot ' + o.getID() + ' = ' + res.radius + '$');
       return res;
     };
 
@@ -1604,9 +1604,9 @@ module.exports = (function () {
       a = this.median / o.median;
       rel = (this.relativeError() + o.relativeError()).toPrecision(2);
       da = rel * a;
-      res = new ErrorInterval(a, da, this.getID() + '/' + o.getID(), true);
+      res = new ErrorInterval(a, da, '\\frac{' + this.getID() + '}{' + o.getID() + '}', true);
       res.steps = this.steps.concat(o.steps);
-      res.steps.push('Δ' + res.getID() + ' = (δ' + this.getID() + ' + δ' + o.getID() + ') * (' + this.getID() + ' / ' + o.getID() + ') = ' + res.radius);
+      res.steps.push('$\\Delta ' + res.getID() + ' = \\left(\\delta ' + this.getID() + ' + \\delta ' + o.getID() + '\\right) \\cdot \\left(\\frac{' + this.getID() + '}{' + o.getID() + '}\\right) = ' + res.radius + '$');
       return res;
     };
 
@@ -1617,11 +1617,11 @@ module.exports = (function () {
       da = rel * a;
       expID = exp;
       if (exp < 0) {
-        expID = '(' + exp + ')';
+        expID = '\\left(' + exp + '\\right)';
       }
       res = new ErrorInterval(a, da, this.getID() + '^' + expID, true);
       res.steps = this.steps;
-      res.steps.push('Δ' + res.getID() + ' = |' + exp + '| * δ' + this.getID() + ' * ' + res.getID() + ' = ' + res.radius);
+      res.steps.push('$\\Delta ' + res.getID() + ' = \\|' + exp + '\\| \\cdot \\delta ' + this.getID() + ' \\cdot ' + res.getID() + ' = ' + res.radius + '$');
       return res;
     };
 
@@ -1647,12 +1647,12 @@ module.exports = (function () {
     };
 
     ErrorInterval.prototype.toString = function () {
-      return '[' + this.getMedian() + '+-' + this.getRadius() + ']';
+      return '\\[' + this.getMedian() + '\\pm' + this.getRadius() + '\\]';
     };
 
     ErrorInterval.prototype.getID = function () {
       if (this.calculated) {
-        return '(' + this.id + ')';
+        return '\\left(' + this.id + '\\right)';
       } else {
         return this.id;
       }
@@ -2120,6 +2120,10 @@ var CalculatorResult = _reactAddons2['default'].createClass({
 		});
 	},
 
+	showResult: function showResult() {
+		return '$ e = \\left( ' + this.showMedian() + ' \\pm ' + this.showRadius() + ' \\right) \\,\\,\\,\\, \\delta e=' + this.showRelativeError() + ' $';
+	},
+
 	render: function render() {
 		var cx = _reactAddons2['default'].addons.classSet;
 		var classes = cx({
@@ -2127,6 +2131,8 @@ var CalculatorResult = _reactAddons2['default'].createClass({
 			'result_container': true,
 			'hide': !this.props.errorInterval
 		});
+
+		// <h2 className="result" ref="resultfield">{this.showResult()} e=({this.showMedian()} &#177; {this.showRadius()}) &delta;e={this.showRelativeError()}</h2>
 
 		return _reactAddons2['default'].createElement(
 			'div',
@@ -2136,21 +2142,22 @@ var CalculatorResult = _reactAddons2['default'].createClass({
 				{ className: 'col-md-12' },
 				_reactAddons2['default'].createElement(
 					'h2',
-					{ className: 'result' },
-					'e=(',
-					this.showMedian(),
-					' ± ',
-					this.showRadius(),
-					') δe=',
-					this.showRelativeError()
+					{ className: 'result', ref: 'resultfield' },
+					this.showResult()
 				),
 				_reactAddons2['default'].createElement(
 					'ul',
-					{ className: 'steps' },
+					{ className: 'steps', ref: 'steps' },
 					this.showSteps()
 				)
 			)
 		);
+	},
+
+	componentDidUpdate: function componentDidUpdate() {
+		// console.log(React.findDOMNode(this.refs.resultfield));
+		// MathJax.Hub.Queue(["Typeset",MathJax.Hub, ]);
+		MathJax.Hub.Queue(['Typeset', MathJax.Hub, [_reactAddons2['default'].findDOMNode(this.refs.resultfield), _reactAddons2['default'].findDOMNode(this.refs.steps)]]);
 	}
 });
 

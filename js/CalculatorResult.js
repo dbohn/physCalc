@@ -43,6 +43,10 @@ var CalculatorResult = React.createClass({
 		});
 	},
 
+	showResult() {
+		return '$ e = \\left( ' + this.showMedian() + ' \\pm ' + this.showRadius() + ' \\right) \\,\\,\\,\\, \\delta e=' + this.showRelativeError() + ' $';
+	},
+
 	render() {
 		var cx = React.addons.classSet;
 		var classes = cx({
@@ -51,15 +55,23 @@ var CalculatorResult = React.createClass({
 			'hide': !this.props.errorInterval
 		});
 
+		// <h2 className="result" ref="resultfield">{this.showResult()} e=({this.showMedian()} &#177; {this.showRadius()}) &delta;e={this.showRelativeError()}</h2>
+
 		return (
 			<div className={classes}>
 			<div className="col-md-12">
-				<h2 className="result">e=({this.showMedian()} &#177; {this.showRadius()}) &delta;e={this.showRelativeError()}</h2>
-				<ul className="steps">
+				<h2 className="result" ref="resultfield">{this.showResult()}</h2>
+				<ul className="steps" ref="steps">
 					{this.showSteps()}
 				</ul>
 			</div>
 		</div>)
+	},
+
+	componentDidUpdate() {
+		// console.log(React.findDOMNode(this.refs.resultfield));
+		// MathJax.Hub.Queue(["Typeset",MathJax.Hub, ]);
+		MathJax.Hub.Queue(["Typeset",MathJax.Hub, [React.findDOMNode(this.refs.resultfield), React.findDOMNode(this.refs.steps)]]);
 	}
 });
 

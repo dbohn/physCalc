@@ -73,7 +73,7 @@
       da = this.radius + o.radius;
       res = new ErrorInterval(a, da, this.getID() + '+' + o.getID(), true);
       res.steps = this.steps.concat(o.steps);
-      res.steps.push('Δ(' + res.getID() + ') = Δ' + this.getID() + ' + ' + 'Δ' + o.getID() + ' = ' + res.radius);
+      res.steps.push('$\\Delta ' + res.getID() + ' = \\Delta ' + this.getID() + ' + ' + '\\Delta ' + o.getID() + ' = ' + res.radius + '$');
       return res;
     };
 
@@ -83,7 +83,7 @@
       da = this.radius + o.radius;
       res = new ErrorInterval(a, da, this.getID() + '-' + o.getID(), true);
       res.steps = this.steps.concat(o.steps);
-      res.steps.push('Δ' + res.getID() + ' = Δ' + this.getID() + ' + ' + 'Δ' + o.getID() + ' = ' + res.radius);
+      res.steps.push('$\\Delta ' + res.getID() + ' = \\Delta ' + this.getID() + ' + ' + '\\Delta ' + o.getID() + ' = ' + res.radius + '$');
       return res;
     };
 
@@ -92,9 +92,9 @@
       a = this.median * o.median;
       rel = (this.relativeError() + o.relativeError()).toPrecision(2);
       da = rel * a;
-      res = new ErrorInterval(a, da, this.getID() + '*' + o.getID(), true);
+      res = new ErrorInterval(a, da, this.getID() + ' \\cdot ' + o.getID(), true);
       res.steps = this.steps.concat(o.steps);
-      res.steps.push('Δ' + res.getID() + ' = (δ' + this.getID() + ' + δ' + o.getID() + ') * ' + this.getID() + ' * ' + o.getID() + ' = ' + res.radius);
+      res.steps.push('$\\Delta ' + res.getID() + ' = \\left(\\delta ' + this.getID() + ' + \\delta ' + o.getID() + '\\right) \\cdot ' + this.getID() + ' \\cdot ' + o.getID() + ' = ' + res.radius + '$');
       return res;
     };
 
@@ -103,9 +103,9 @@
       a = this.median / o.median;
       rel = (this.relativeError() + o.relativeError()).toPrecision(2);
       da = rel * a;
-      res = new ErrorInterval(a, da, this.getID() + '/' + o.getID(), true);
+      res = new ErrorInterval(a, da, '\\frac{' + this.getID() + '}{' + o.getID() + '}', true);
       res.steps = this.steps.concat(o.steps);
-      res.steps.push('Δ' + res.getID() + ' = (δ' + this.getID() + ' + δ' + o.getID() + ') * (' + this.getID() + ' / ' + o.getID() + ') = ' + res.radius);
+      res.steps.push('$\\Delta ' + res.getID() + ' = \\left(\\delta ' + this.getID() + ' + \\delta ' + o.getID() + '\\right) \\cdot \\left(\\frac{' + this.getID() + '}{' + o.getID() + '}\\right) = ' + res.radius + '$');
       return res;
     };
 
@@ -116,11 +116,11 @@
       da = rel * a;
       expID = exp;
       if (exp < 0) {
-        expID = '(' + exp + ')';
+        expID = '\\left(' + exp + '\\right)';
       }
       res = new ErrorInterval(a, da, this.getID() + '^' + expID, true);
       res.steps = this.steps;
-      res.steps.push('Δ' + res.getID() + ' = |' + exp + '| * δ' + this.getID() + ' * ' + res.getID() + ' = ' + res.radius);
+      res.steps.push('$\\Delta ' + res.getID() + ' = \\|' + exp + '\\| \\cdot \\delta ' + this.getID() + ' \\cdot ' + res.getID() + ' = ' + res.radius + '$');
       return res;
     };
 
@@ -146,12 +146,12 @@
     };
 
     ErrorInterval.prototype.toString = function() {
-      return '[' + this.getMedian() + '+-' + this.getRadius() + ']';
+      return '\\[' + this.getMedian() + '\\pm' + this.getRadius() + '\\]';
     };
 
     ErrorInterval.prototype.getID = function() {
       if (this.calculated) {
-        return '(' + this.id + ')';
+        return '\\left(' + this.id + '\\right)';
       } else {
         return this.id;
       }
