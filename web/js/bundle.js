@@ -1368,7 +1368,13 @@ module.exports = (function () {
       case 'asn':
         operand = operand.apply(asin);
         break;
+      case 'asin':
+        operand = operand.apply(asin);
+        break;
       case 'acs':
+        operand = operand.apply(acos);
+        break;
+      case 'acos':
         operand = operand.apply(acos);
         break;
       case 'atn':
@@ -1377,10 +1383,10 @@ module.exports = (function () {
       case 'atan':
         operand = operand.apply(atan);
         break;
-      case 'log':
+      case 'ln':
         operand = operand.apply(Math.log);
         break;
-      case 'lgt':
+      case 'log':
         operand = operand.apply(Physik.log10);
         break;
       default:
