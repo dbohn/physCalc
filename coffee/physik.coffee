@@ -3,12 +3,29 @@
 
 index = 0
 ids = 'abcdefghijklmnopqrstuvwxyz'
+used = []
 
-getNewID = ->
+generateID = ->
   if index >= ids.length
    m = index++
    return ids[(m % ids.length)] + Math.floor (m / ids.length)
   return ids[index++]
+
+getNewID = (c) ->
+
+  if arguments.length > 0
+    used.push(c)
+    c
+  else
+    candidate = generateID()
+    while used.indexOf(candidate) >= 0
+      candidate = generateID()
+    used.push(candidate)
+    if arguments.length > 0
+      candidate+='\\['+c+'\\]'
+    candidate
+
+
 
 # Returns the number of digits after the comma
 #
@@ -43,6 +60,7 @@ significantDigitsCeiling = (num, n) ->
 
 resetIDGenerator = ->
   index = 0
+  used = []
 
 # Represents an error interval
 class ErrorInterval
@@ -58,7 +76,7 @@ class ErrorInterval
     
     @calculated = false
     if arguments.length >= 3
-      @id = arguments[2]
+      @id = getNewID(arguments[2])
       if arguments.length == 4 and arguments[3]
         @calculated = true
     else
@@ -72,7 +90,7 @@ class ErrorInterval
   # @return [Float] relative error
   #
   relativeError: -> 
-    parseFloat (@radius / @median).toPrecision(2)
+    Math.abs parseFloat (@radius / @median).toPrecision(2)
 
   # Adds another interval
   #
@@ -145,7 +163,7 @@ class ErrorInterval
 
     res = new ErrorInterval(a, da, @.getID()+'^'+expID, true)
     res.steps = @.steps
-    res.steps.push('$\\Delta '+res.getID()+' = \\|'+exp+'\\| \\cdot \\delta '+@.getID()+' \\cdot '+res.getID()+' = '+res.radius+'$')
+    res.steps.push('$\\Delta '+res.getID()+' = \\left|'+exp+'\\right| \\cdot \\delta '+@.getID()+' \\cdot '+res.getID()+' = '+res.radius+'$')
     res
 
 
@@ -162,11 +180,15 @@ class ErrorInterval
   #
   # @param [Function] f the function
   # @return [ErrorInterval] result
-  apply: (f) ->
+  apply: (f, name) ->
+    if arguments.length < 2
+      name = getNewID()
     k = f(@median)
-    console.log(k)
     dk = Math.abs(f((@median + @radius)) - k)
-    new ErrorInterval(k, dk)
+    res = new ErrorInterval(k, dk, '\\text{'+name+'} \\left('+@.getID()+'\\right)' ,true)
+    res.steps = @.steps
+    res.steps.push('$\\Delta '+res.getID()+' = \\left| \\text{'+name+'}\\left('+@.getID()+' + \\Delta '+@.getID()+'\\right) - \\text{'+name+'}\\left('+@.getID()+'\\right)\\right|$')
+    res
 
   # Create an error interval based on this interval
   # with the precision of end results.
@@ -183,7 +205,7 @@ class ErrorInterval
 
   # @return [String]
   toString: ->
-    '\\['+@.getMedian()+'\\pm'+@.getRadius()+'\\]'
+    '\\left['+@.getMedian()+'\\pm'+@.getRadius()+'\\right]'
 
   getID: ->
     if @.calculated then '\\left('+@.id+'\\right)'
