@@ -242,7 +242,11 @@ createFromAnalogMeasurement = (val, k, range) ->
 createFromDigitalMeasurement = (val, p, d) ->
   da = ((p / 100) * val.median)
   da += d * Math.pow(10, -decimalPlaces val.unparsedMedian) 
-  new ErrorInterval(val.median, da)
+
+  if arguments.length >= 4
+    new ErrorInterval(val.median, da, arguments[3])
+  else
+    new ErrorInterval(val.median, da)
 
 # Sinus function which can be used in 
 # the ErrorInterval.apply() function
