@@ -5,7 +5,7 @@
  */
 
 (function() {
-  var Physik, acos, add, addVariable, applyOperator, asin, atan, cleanVariables, convVal, create, createFromAnalogue, createFromDigital, div, endResult, mult, pow, removeVariable, resolveVariable, sub, variables;
+  var Physik, acos, add, addVariable, applyOperator, asin, atan, cleanVariables, convVal, create, createFromAnalogue, createFromDigital, createNamed, div, endResult, mult, pow, removeVariable, resetParser, resolveVariable, sub, variableExists, variables;
 
   Physik = require('./physik');
 
@@ -54,6 +54,10 @@
 
   create = function(median, derivation) {
     return new Physik.ErrorInterval(median, derivation);
+  };
+
+  createNamed = function(median, derivation, name) {
+    return new Physik.ErrorInterval(median, derivation, name);
   };
 
   createFromDigital = function(median, percentage, digit) {
@@ -139,8 +143,16 @@
     return delete variables[varname];
   };
 
+  variableExists = function(varname) {
+    return variables.hasOwnProperty(varname);
+  };
+
   cleanVariables = function() {
     return variables = {};
+  };
+
+  resetParser = function() {
+    return Physik.resetIDGenerator();
   };
 
   module.exports = {
@@ -152,12 +164,15 @@
     create: create,
     endResult: endResult,
     convVal: convVal,
+    createNamed: createNamed,
     applyOperator: applyOperator,
     createFromDigital: createFromDigital,
     createFromAnalogue: createFromAnalogue,
     resolveVariable: resolveVariable,
     addVariable: addVariable,
-    removeVariable: removeVariable
+    removeVariable: removeVariable,
+    resetParser: resetParser,
+    variableExists: variableExists
   };
 
 }).call(this);

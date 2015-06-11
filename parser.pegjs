@@ -1,5 +1,6 @@
 {
     var parsertools = require('./parsertools');
+    parsertools.resetParser();
     function leftAssoc(rest, val) {
         
         if (!rest.length) return val;

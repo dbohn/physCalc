@@ -1230,6 +1230,7 @@ module.exports = (function () {
     }
 
     var parsertools = require("./parsertools");
+    parsertools.resetParser();
     function leftAssoc(rest, val) {
 
       if (!rest.length) return val;
@@ -1293,7 +1294,7 @@ module.exports = (function () {
 'use strict';
 
 (function () {
-  var Physik, acos, add, addVariable, applyOperator, asin, atan, cleanVariables, convVal, create, createFromAnalogue, createFromDigital, div, endResult, mult, pow, removeVariable, resolveVariable, sub, variables;
+  var Physik, acos, add, addVariable, applyOperator, asin, atan, cleanVariables, convVal, create, createFromAnalogue, createFromDigital, createNamed, div, endResult, mult, pow, removeVariable, resetParser, resolveVariable, sub, variableExists, variables;
 
   Physik = require('./physik');
 
@@ -1342,6 +1343,10 @@ module.exports = (function () {
 
   create = function (median, derivation) {
     return new Physik.ErrorInterval(median, derivation);
+  };
+
+  createNamed = function (median, derivation, name) {
+    return new Physik.ErrorInterval(median, derivation, name);
   };
 
   createFromDigital = function (median, percentage, digit) {
@@ -1427,8 +1432,16 @@ module.exports = (function () {
     return delete variables[varname];
   };
 
+  variableExists = function (varname) {
+    return variables.hasOwnProperty(varname);
+  };
+
   cleanVariables = function () {
     return variables = {};
+  };
+
+  resetParser = function () {
+    return Physik.resetIDGenerator();
   };
 
   module.exports = {
@@ -1440,12 +1453,15 @@ module.exports = (function () {
     create: create,
     endResult: endResult,
     convVal: convVal,
+    createNamed: createNamed,
     applyOperator: applyOperator,
     createFromDigital: createFromDigital,
     createFromAnalogue: createFromAnalogue,
     resolveVariable: resolveVariable,
     addVariable: addVariable,
-    removeVariable: removeVariable
+    removeVariable: removeVariable,
+    resetParser: resetParser,
+    variableExists: variableExists
   };
 }).call(undefined);
 
@@ -1737,8 +1753,6 @@ var _reactAddons = require('react/addons');
 
 var _reactAddons2 = _interopRequireDefault(_reactAddons);
 
-_distParsertools2['default'].addVariable('U', _distParsertools2['default'].create(5, 10));
-
 var Calculator = _reactAddons2['default'].createClass({
 	displayName: 'Calculator',
 
@@ -2015,6 +2029,20 @@ var CalculatorResult = _reactAddons2['default'].createClass({
 		return this.props.errorInterval.relativeError();
 	},
 
+	showSteps: function showSteps() {
+		if (!this.props.errorInterval) {
+			return '';
+		}
+
+		return this.props.errorInterval.steps.map(function (el) {
+			return _reactAddons2['default'].createElement(
+				'li',
+				null,
+				el
+			);
+		});
+	},
+
 	render: function render() {
 		var cx = _reactAddons2['default'].addons.classSet;
 		var classes = cx({
@@ -2038,6 +2066,11 @@ var CalculatorResult = _reactAddons2['default'].createClass({
 					this.showRadius(),
 					') δe=',
 					this.showRelativeError()
+				),
+				_reactAddons2['default'].createElement(
+					'ul',
+					{ className: 'steps' },
+					this.showSteps()
 				)
 			)
 		);
@@ -2085,9 +2118,15 @@ var VariableInput = _reactAddons2['default'].createClass({
 	},
 
 	addVar: function addVar(e) {
+		name = toLetters(counter++);
+
+		while (_distParsertools2['default'].variableExists(name)) {
+			name = toLetters(counter++);
+		}
+
 		var newVar = {
 			type: 'errorvalue',
-			name: toLetters(counter++),
+			name: name,
 			median: 0,
 			radius: 0
 		};
@@ -2156,7 +2195,7 @@ var VariableInput = _reactAddons2['default'].createClass({
 		var name = varfield.name,
 		    median = varfield.median,
 		    radiand = varfield.radius;
-		_distParsertools2['default'].addVariable(name, _distParsertools2['default'].create(median, radiand));
+		_distParsertools2['default'].addVariable(name, _distParsertools2['default'].createNamed(median, radiand, name));
 	},
 
 	render: function render() {

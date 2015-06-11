@@ -21,9 +21,15 @@ var VariableInput = React.createClass({
 	},
 
 	addVar(e) {
+		name = toLetters(counter++);
+
+		while (Parsertools.variableExists(name)) {
+			name = toLetters(counter++);
+		}
+
 		var newVar = {
 			type: "errorvalue",
-			name: toLetters(counter++),
+			name: name,
 			median: 0.0,
 			radius: 0.0
 		};
@@ -93,7 +99,7 @@ var VariableInput = React.createClass({
 		var name = varfield.name,
 			median = varfield.median,
 			radiand = varfield.radius;
-		Parsertools.addVariable(name, Parsertools.create(median, radiand));
+		Parsertools.addVariable(name, Parsertools.createNamed(median, radiand, name));
 	},
 
 	render() {

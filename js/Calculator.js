@@ -6,8 +6,6 @@ import Parser from '../dist/parser'
 import Parsertools from '../dist/parsertools'
 import React from 'react/addons'
 
-Parsertools.addVariable("U", Parsertools.create(5,10))
-
 var Calculator = React.createClass({
 	getInitialState() {
 		return {

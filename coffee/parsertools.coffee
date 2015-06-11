@@ -72,6 +72,9 @@ endResult = (a) ->
 create = (median, derivation) ->
 	new Physik.ErrorInterval(median, derivation)
 
+createNamed = (median, derivation, name) ->
+	new Physik.ErrorInterval(median, derivation, name)
+
 createFromDigital = (median, percentage, digit) ->
 	Physik.createFromDigitalMeasurement(convVal(median), Math.abs(percentage), Math.abs(digit))
 
@@ -120,13 +123,21 @@ addVariable = (varname, errorInterval) ->
 removeVariable = (varname) ->
 	delete variables[varname]
 
+variableExists = (varname) ->
+	# console.log(varname, variables, variables.hasOwnProperty(varname))
+	variables.hasOwnProperty(varname)
+
 cleanVariables = () ->
 	variables = {}
 
+resetParser = () ->
+	Physik.resetIDGenerator()
+
 module.exports = {
 	add, sub, mult, div, pow,
-	create, endResult, convVal,
+	create, endResult, convVal, createNamed,
 	applyOperator, createFromDigital,
 	createFromAnalogue, resolveVariable,
-	addVariable, removeVariable
+	addVariable, removeVariable,
+	resetParser, variableExists
 }
