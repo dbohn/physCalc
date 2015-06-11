@@ -1,47 +1,66 @@
 import React from 'react/addons'
 
+import Parsertools from '../dist/parsertools'
+
+function toLetters(num) {
+    "use strict";
+    var mod = num % 26;
+    var pow = num / 26 | 0;
+    var out = mod ? String.fromCharCode(64 + mod) : (pow--, 'Z');
+    return pow ? toLetters(pow) + out : out;
+}
+
+var counter = 1;
+
 var VariableInput = React.createClass({
 	getInitialState() {
 		return {
-			variables: [
-				{
-					type: "errorvalue",
-					name: "U",
-					median: 5.3,
-					radius: 0.7
-				}
-			]
+			counter: 0,
+			variables: []
 		}
 	},
 
 	addVar(e) {
+		var newVar = {
+			type: "errorvalue",
+			name: toLetters(counter++),
+			median: 0.0,
+			radius: 0.0
+		};
+
 		this.setState({
 			variables: this.state.variables.concat([
-			{
-				type: "errorvalue",
-				name: "",
-				median: 0.0,
-				radius: 0.0
-			}])
+			newVar])
 		});
+
+		this.updateOrAddVar(newVar);
 
 		e.preventDefault();
 	},
 
 	removeVar(variable, e) {
+		var varname = this.state.variables[variable].name;
 		var newData = this.state.variables.slice(); //copy array
     	newData.splice(variable, 1); //remove element
     	this.setState({variables: newData}); //update state
+
+    	Parsertools.removeVariable(varname);
+
     	e.preventDefault();
 	},
 
 	changeName(i, e) {
 		var newName = e.target.value;
 		var cpy = this.state.variables.slice();
+
+		Parsertools.removeVariable(cpy[i].name);
+
 		cpy[i].name = newName;
 		this.setState({
 			variables: cpy
 		});
+
+		this.updateOrAddVar(cpy[i]);
 	},
 
 	changeMedian(i, e) {
@@ -53,6 +72,8 @@ var VariableInput = React.createClass({
 		this.setState({
 			variables: cpy
 		});
+
+		this.updateOrAddVar(cpy[i]);
 	},
 
 	changeRadius(i, e) {
@@ -64,6 +85,15 @@ var VariableInput = React.createClass({
 		this.setState({
 			variables: cpy
 		});
+
+		this.updateOrAddVar(cpy[i]);
+	},
+
+	updateOrAddVar(varfield) {
+		var name = varfield.name,
+			median = varfield.median,
+			radiand = varfield.radius;
+		Parsertools.addVariable(name, Parsertools.create(median, radiand));
 	},
 
 	render() {
@@ -76,13 +106,11 @@ var VariableInput = React.createClass({
 									<option value="analogvalue">Analogwert</option>
 								</select>
 							</div>
-							<div className="col-md-3">
+							<div className="col-md-9 varinput">
 								<input type="text" onChange={this.changeName.bind(this, i)} className="form-control" placeholder="Name" value={variable.name} />
-							</div>
-							<div className="col-md-3">
+								<span className="separator">=</span>
 								<input type="text" onChange={this.changeMedian.bind(this, i)} className="form-control" placeholder="Median" value={variable.median} />
-							</div>
-							<div className="col-md-3">
+								<span className="separator">&plusmn;</span>
 								<input type="text" onChange={this.changeRadius.bind(this, i)} className="form-control" placeholder="Radius" value={variable.radius} />
 							</div>
 							<div className="col-md-1">

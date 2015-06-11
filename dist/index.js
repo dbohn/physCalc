@@ -1,1 +1,98 @@
-(function(){var e,r,n,t,s,i,a,o,u,c,l,d,h,m,L;u=require("./parser"),c=require("./parsertools"),a=document.querySelector("form[name=calculator_input]"),m=document.querySelector(".result_container"),t=document.querySelector(".error_container"),h=m.querySelector(".result"),s=t.querySelector(".error"),i=t.querySelector(".infotext"),o=h.querySelector(".median"),l=h.querySelector(".radius"),d=h.querySelector(".rel_error"),a.addEventListener("submit",function(t){var s,i,h,L;if(t.preventDefault(),h=a[0].value.trim(),""!==h)try{return L=u.parse(h),L=c.convVal(L),m.classList.remove("hide"),a.classList.add("has-success"),o.innerHTML=L.getMedian(),l.innerHTML=L.getRadius(),d.innerHTML=L.relativeError()}catch(f){return i=f,console.log(i),i instanceof u.SyntaxError?(s="Es wurde "+e(i.expected)+" erwartet. Gefunden wurde aber "+r(i.found)+".",n("Der Ausdruck enthält einen syntaktische Fehler an Position "+i.column+"!",s)):n("Exponent must not have error"===i?"Der absolute Fehler des Exponenten muss 0 sein!":"Ein unbekannter Fehler ist aufgetreten!")}}),a[0].addEventListener("change",function(e){return a.classList.remove("has-error"),a.classList.remove("has-success"),t.classList.add("hide"),m.classList.add("hide")}),r=function(e){return null===e?"nichts":'"'+e+'"'},e=function(e){return 1===e.length?L(e[0]):e.slice(0,e.length-1).map(L).join(", ")+" oder "+L(e[e.length-1])},L=function(e){return"end"===e.type?"das Eingabeende":e.description},n=function(e){return a.classList.add("has-error"),a.classList.remove("has-success"),t.classList.remove("hide"),s.innerHTML=e,i.innerHTML="",2===arguments.length?i.innerHTML=arguments[1]:void 0}}).call(this);
+(function() {
+  var connectList, convertFound, error, errorContainer, errorElem, errorInfo, form, median, parser, parsertools, radius, relError, result, resultContainer, stringifyItem;
+
+  parser = require('./parser');
+
+  parsertools = require('./parsertools');
+
+  form = document.querySelector('form[name=calculator_input]');
+
+  resultContainer = document.querySelector('.result_container');
+
+  errorContainer = document.querySelector('.error_container');
+
+  result = resultContainer.querySelector('.result');
+
+  errorElem = errorContainer.querySelector('.error');
+
+  errorInfo = errorContainer.querySelector('.infotext');
+
+  median = result.querySelector('.median');
+
+  radius = result.querySelector('.radius');
+
+  relError = result.querySelector('.rel_error');
+
+  form.addEventListener('submit', function(ev) {
+    var desc, err, query, resError;
+    ev.preventDefault();
+    query = form[0].value.trim();
+    if (query === '') {
+      return;
+    }
+    try {
+      resError = parser.parse(query);
+      resError = parsertools.convVal(resError);
+      resultContainer.classList.remove('hide');
+      form.classList.add('has-success');
+      median.innerHTML = resError.getMedian();
+      radius.innerHTML = resError.getRadius();
+      return relError.innerHTML = resError.relativeError();
+    } catch (_error) {
+      err = _error;
+      console.log(err);
+      if (err instanceof parser.SyntaxError) {
+        desc = 'Es wurde ' + connectList(err.expected) + ' erwartet. Gefunden wurde aber ' + convertFound(err.found) + '.';
+        return error('Der Ausdruck enthält einen syntaktische Fehler an Position ' + err.column + '!', desc);
+      } else if (err === 'Exponent must not have error') {
+        return error('Der absolute Fehler des Exponenten muss 0 sein!');
+      } else {
+        return error('Ein unbekannter Fehler ist aufgetreten!');
+      }
+    }
+  });
+
+  form[0].addEventListener('change', function(ev) {
+    form.classList.remove('has-error');
+    form.classList.remove('has-success');
+    errorContainer.classList.add('hide');
+    return resultContainer.classList.add('hide');
+  });
+
+  convertFound = function(found) {
+    if (found === null) {
+      return 'nichts';
+    } else {
+      return '"' + found + '"';
+    }
+  };
+
+  connectList = function(list) {
+    if (list.length === 1) {
+      return stringifyItem(list[0]);
+    }
+    return list.slice(0, list.length - 1).map(stringifyItem).join(", ") + ' oder ' + stringifyItem(list[list.length - 1]);
+  };
+
+  stringifyItem = function(item) {
+    if (item.type === 'end') {
+      return 'das Eingabeende';
+    } else {
+      return item.description;
+    }
+  };
+
+  error = function(msg) {
+    form.classList.add('has-error');
+    form.classList.remove('has-success');
+    errorContainer.classList.remove('hide');
+    errorElem.innerHTML = msg;
+    errorInfo.innerHTML = '';
+    if (arguments.length === 2) {
+      return errorInfo.innerHTML = arguments[1];
+    }
+  };
+
+}).call(this);
+
+//# sourceMappingURL=index.js.map

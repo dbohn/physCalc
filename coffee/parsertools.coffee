@@ -5,6 +5,8 @@
 
 Physik = require('./physik');
 
+variables = {};
+
 # Adds two values, which should be either ErrorIntervals or numerical values
 #
 # @param [Float|Physik.ErrorInterval] Should be a ErrorInterval, otherwise it will be converted
@@ -85,10 +87,13 @@ applyOperator = (operator, operand) ->
 		when "cos" then operand = operand.apply(Physik.cos)
 		when "tan" then operand = operand.apply(Physik.tan)
 		when "asn" then operand = operand.apply(asin)
+		when "asin" then operand = operand.apply(asin)
 		when "acs" then operand = operand.apply(acos)
+		when "acos" then operand = operand.apply(acos)
 		when "atn" then operand = operand.apply(atan)
-		when "log" then operand = operand.apply(Math.log)
-		when "lgt" then operand = operand.apply(Physik.log10)
+		when "atan" then operand = operand.apply(atan)
+		when "ln" then operand = operand.apply(Math.log)
+		when "log" then operand = operand.apply(Physik.log10)
 		else operand = operand
 	operand
 
@@ -104,4 +109,24 @@ acos = (rad) ->
 atan = (rad) ->
 	Math.atan(rad)*(180/Math.PI)
 
-module.exports = {add, sub, mult, div, pow, create, endResult, convVal, applyOperator, createFromDigital, createFromAnalogue}
+resolveVariable = (variable) ->
+	# console.log(variables)
+	variables[variable];
+	# create(0, 0)
+
+addVariable = (varname, errorInterval) ->
+	variables[varname] = errorInterval
+
+removeVariable = (varname) ->
+	delete variables[varname]
+
+cleanVariables = () ->
+	variables = {}
+
+module.exports = {
+	add, sub, mult, div, pow,
+	create, endResult, convVal,
+	applyOperator, createFromDigital,
+	createFromAnalogue, resolveVariable,
+	addVariable, removeVariable
+}

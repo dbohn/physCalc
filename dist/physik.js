@@ -1,1 +1,173 @@
-(function(){var t,e,r,i,n,o,a,u,s,d,c=function(t,e){function r(){this.constructor=t}for(var i in e)h.call(e,i)&&(t[i]=e[i]);return r.prototype=e.prototype,t.prototype=new r,t.__super__=e.prototype,t},h={}.hasOwnProperty;o=function(t){var e;return e=(""+t).match(/(?:\.(\d+))?(?:[eE]([+-]?\d+))?$/),e?Math.max(0,(e[1]?e[1].length:0)-(e[2]?+e[2]:0)):0},a=Math.log10||function(t){return Math.log(t)/Math.LN10},u=function(t,e){var r,i,n,o;return 0===t?0:(r=Math.ceil(a(0>t?-t:t)),n=e-Math.floor(r),i=Math.pow(10,n),o=Math.ceil(t*i),o/i)},e=function(){function e(t,e){this.median=parseFloat(t),this.radius=parseFloat(e)}return e.prototype.relativeError=function(){return parseFloat((this.radius/this.median).toPrecision(2))},e.prototype.add=function(t){var r,i;return r=this.median+t.median,i=this.radius+t.radius,new e(r,i).intermediateResult()},e.prototype.sub=function(t){var r,i;return r=this.median-t.median,i=this.radius+t.radius,new e(r,i).intermediateResult()},e.prototype.mult=function(t){var r,i,n;return r=this.median*t.median,n=(this.relativeError()+t.relativeError()).toPrecision(2),i=(n*r).toPrecision(2),new e(r,i).intermediateResult()},e.prototype.div=function(t){var r,i,n;return r=this.median/t.median,n=(this.relativeError()+t.relativeError()).toPrecision(2),i=(n*r).toPrecision(2),new e(r,i).intermediateResult()},e.prototype.pow=function(t){var r,i,n;return r=Math.pow(this.median,t),n=(this.relativeError()*Math.abs(t)).toPrecision(2),i=(n*r).toPrecision(2),new e(r,i).intermediateResult()},e.prototype.scalar=function(t){return this.mult(new e(t,0)).intermediateResult()},e.prototype.apply=function(t){var r,i;return i=t(this.median),r=Math.abs(t(this.median+this.radius)-i),new e(i,r).intermediateResult()},e.prototype.endResult=function(){var e,r;return r=u(this.radius,1),e=this.median.toFixed(o(r)),new t(e,r)},e.prototype.intermediateResult=function(){var t,r;return r=this.radius.toPrecision(2),t=this.median.toFixed(o(r)),new e(t,r)},e.prototype.toString=function(){return"["+this.getMedian()+"+-"+this.getRadius()+"]"},e.prototype.getMedian=function(){return this.median.toFixed(o(this.getRadius()))},e.prototype.getRadius=function(){return""+this.radius.toPrecision(2)},e}(),t=function(t){function e(){return e.__super__.constructor.apply(this,arguments)}return c(e,t),e.prototype.getRadius=function(){return""+this.radius.toPrecision(1)},e}(e),i=function(t,r,i){var n,o;return o=r/100*i,n=t.radius,new e(t.median,o+n).intermediateResult()},n=function(t,r,i){var n;return n=r/100*t.median,n+=i*Math.pow(10,-o(t.median)),new e(t.median,n).intermediateResult()},s=function(t){return Math.sin(t*(Math.PI/180))},r=function(t){return Math.cos(t*(Math.PI/180))},d=function(t){return Math.tan(t*(Math.PI/180))},module.exports={ErrorInterval:e,log10:a,sin:s,cos:r,tan:d,createFromAnalogMeasurement:i,createFromDigitalMeasurement:n}}).call(this);
+(function() {
+  var EndResult, ErrorInterval, cos, createFromAnalogMeasurement, createFromDigitalMeasurement, decimalPlaces, log10, significantDigitsCeiling, sin, tan,
+    extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+    hasProp = {}.hasOwnProperty;
+
+  decimalPlaces = function(num) {
+    var match;
+    match = ('' + num).match(/(?:\.(\d+))?(?:[eE]([+-]?\d+))?$/);
+    if (!match) {
+      return 0;
+    }
+    return Math.max(0, (match[1] ? match[1].length : 0) - (match[2] ? +match[2] : 0));
+  };
+
+  log10 = Math.log10 || function(x) {
+    return Math.log(x) / Math.LN10;
+  };
+
+  significantDigitsCeiling = function(num, n) {
+    var d, magnitude, power, shifted;
+    if (num === 0) {
+      return 0;
+    }
+    d = Math.ceil(log10(num < 0 ? -num : num));
+    power = n - Math.floor(d);
+    magnitude = Math.pow(10, power);
+    shifted = Math.ceil(num * magnitude);
+    return shifted / magnitude;
+  };
+
+  ErrorInterval = (function() {
+    function ErrorInterval(median, radius) {
+      this.median = parseFloat(median);
+      this.radius = parseFloat(radius);
+    }
+
+    ErrorInterval.prototype.relativeError = function() {
+      return parseFloat((this.radius / this.median).toPrecision(2));
+    };
+
+    ErrorInterval.prototype.add = function(o) {
+      var a, da;
+      a = this.median + o.median;
+      da = this.radius + o.radius;
+      return new ErrorInterval(a, da).intermediateResult();
+    };
+
+    ErrorInterval.prototype.sub = function(o) {
+      var a, da;
+      a = this.median - o.median;
+      da = this.radius + o.radius;
+      return new ErrorInterval(a, da).intermediateResult();
+    };
+
+    ErrorInterval.prototype.mult = function(o) {
+      var a, da, rel;
+      a = this.median * o.median;
+      rel = (this.relativeError() + o.relativeError()).toPrecision(2);
+      da = (rel * a).toPrecision(2);
+      return new ErrorInterval(a, da).intermediateResult();
+    };
+
+    ErrorInterval.prototype.div = function(o) {
+      var a, da, rel;
+      a = this.median / o.median;
+      rel = (this.relativeError() + o.relativeError()).toPrecision(2);
+      da = (rel * a).toPrecision(2);
+      return new ErrorInterval(a, da).intermediateResult();
+    };
+
+    ErrorInterval.prototype.pow = function(exp) {
+      var a, da, rel;
+      a = Math.pow(this.median, exp);
+      rel = (this.relativeError() * Math.abs(exp)).toPrecision(2);
+      da = (rel * a).toPrecision(2);
+      return new ErrorInterval(a, da).intermediateResult();
+    };
+
+    ErrorInterval.prototype.scalar = function(c) {
+      return (this.mult(new ErrorInterval(c, 0))).intermediateResult();
+    };
+
+    ErrorInterval.prototype.apply = function(f) {
+      var dk, k;
+      k = f(this.median);
+      dk = Math.abs(f(this.median + this.radius) - k);
+      return new ErrorInterval(k, dk).intermediateResult();
+    };
+
+    ErrorInterval.prototype.endResult = function() {
+      var resMedian, resRadius;
+      resRadius = significantDigitsCeiling(this.radius, 1);
+      resMedian = this.median.toFixed(decimalPlaces(resRadius));
+      return new EndResult(resMedian, resRadius);
+    };
+
+    ErrorInterval.prototype.intermediateResult = function() {
+      var resMedian, resRadius;
+      resRadius = this.radius.toPrecision(2);
+      resMedian = this.median.toFixed(decimalPlaces(resRadius));
+      return new ErrorInterval(resMedian, resRadius);
+    };
+
+    ErrorInterval.prototype.toString = function() {
+      return '[' + this.getMedian() + '+-' + this.getRadius() + ']';
+    };
+
+    ErrorInterval.prototype.getMedian = function() {
+      return this.median.toFixed(decimalPlaces(this.getRadius()));
+    };
+
+    ErrorInterval.prototype.getRadius = function() {
+      return '' + this.radius.toPrecision(2);
+    };
+
+    return ErrorInterval;
+
+  })();
+
+  EndResult = (function(superClass) {
+    extend(EndResult, superClass);
+
+    function EndResult() {
+      return EndResult.__super__.constructor.apply(this, arguments);
+    }
+
+    EndResult.prototype.getRadius = function() {
+      return '' + this.radius.toPrecision(1);
+    };
+
+    return EndResult;
+
+  })(ErrorInterval);
+
+  createFromAnalogMeasurement = function(val, k, range) {
+    var da, dk;
+    dk = (k / 100) * range;
+    da = val.radius;
+    return new ErrorInterval(val.median, dk + da).intermediateResult();
+  };
+
+  createFromDigitalMeasurement = function(val, p, d) {
+    var da;
+    da = (p / 100) * val.median;
+    da += d * Math.pow(10, -decimalPlaces(val.median));
+    return new ErrorInterval(val.median, da).intermediateResult();
+  };
+
+  sin = function(v) {
+    return Math.sin(v * (Math.PI / 180));
+  };
+
+  cos = function(v) {
+    return Math.cos(v * (Math.PI / 180));
+  };
+
+  tan = function(v) {
+    return Math.tan(v * (Math.PI / 180));
+  };
+
+  module.exports = {
+    ErrorInterval: ErrorInterval,
+    log10: log10,
+    sin: sin,
+    cos: cos,
+    tan: tan,
+    createFromAnalogMeasurement: createFromAnalogMeasurement,
+    createFromDigitalMeasurement: createFromDigitalMeasurement
+  };
+
+}).call(this);
+
+//# sourceMappingURL=physik.js.map
