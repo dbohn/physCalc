@@ -116,6 +116,7 @@ atan = (rad) ->
 
 resolveVariable = (variable) ->
 	# console.log(variables)
+	throw new UnknownIdentifierError variable if not variableExists variable
 	variables[variable];
 	# create(0, 0)
 
@@ -135,11 +136,19 @@ cleanVariables = () ->
 resetParser = () ->
 	Physik.resetIDGenerator()
 
+UnknownIdentifierError = (identifier) ->
+	@name = 'UnknownIdentifierError'
+	@identifier = identifier
+	@stack = (new Error).stack
+
+UnknownIdentifierError:: = new Error
+
 module.exports = {
 	add, sub, mult, div, pow,
 	create, endResult, convVal, createNamed,
 	applyOperator, createFromDigital,
 	createFromAnalogue, resolveVariable,
 	addVariable, removeVariable,
-	resetParser, variableExists
+	resetParser, variableExists,
+	UnknownIdentifierError
 }

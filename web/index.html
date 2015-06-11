@@ -10,26 +10,13 @@
 </head>
 <body>
 <div class="top">
-	<h1>Fehlerrechner</h1>
-	<div class="inputfield">
-		<div class="row result_container hide">
-			<div class="col-md-12">
-				<h2 class="result">e=(<span class="median">5</span> &#177; <span class="radius">0.2</span>) &delta;e=<span class="rel_error">0.04</span></h2>
-			</div>
-		</div>
-		<div class="row error_container hide">
-			<div class="col-md-12">
-				<h2 class="error">Error</h2>
-				<p class="infotext">Beschreibung</p>
-			</div>
-		</div>
-	</div>
+	<h1>Fehlerrechner 2.0</h1>
 </div>
 <div class="bottom">
 	<div class="container">
 		<div class="row">
-			<div class="col-md-12 variables">
-				
+			<div class="col-md-12 new-ui-container">
+					
 			</div>
 		</div>
 		<div class="row">
@@ -38,9 +25,9 @@
 					<h4>Tutorial</h4>
 					<p>Dieses Skript wertet die oben eingegebenen arithmetischen Ausdrücke aus. Folgende Operationen werden derzeit unterstützt:</p>
 					<ul>
-						<li>Addition (+), Subtraktion (-)</li>
-						<li>Multiplikation (*), Division (/)</li>
-						<li>Potenz (^)</li>
+						<li>Addition (<code>+</code>), Subtraktion (<code>-</code>)</li>
+						<li>Multiplikation (<code>*</code>), Division (<code>/</code>)</li>
+						<li>Potenz (<code>^</code>)</li>
 						<li>Trigonometrische Funktionen (<code>@sin</code>, <code>@cos</code>, <code>@tan</code>, <code>@asin</code>, <code>@acos</code>, <code>@atan</code>)</li>
 						<li>Logarithmus: Basis 10 (<code>@log</code>), Naturalis (<code>@ln</code>)</li>
 					</ul>
@@ -75,6 +62,12 @@
 		</footer>
 	</div>
 </div>
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+});
+</script>
+<script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
 <script src="js/bundle.js"></script>
 </body>
 </html>

@@ -42,7 +42,7 @@ significantDigitsCeiling = (num, n) ->
   shifted / magnitude
 
 resetIDGenerator = ->
-  index = 0  
+  index = 0
 
 # Represents an error interval
 class ErrorInterval
@@ -84,7 +84,7 @@ class ErrorInterval
 
     res = new ErrorInterval(a, da, @.getID()+'+'+o.getID(), true)
     res.steps = @.steps.concat(o.steps)
-    res.steps.push('Δ('+res.getID()+') = Δ'+@.getID()+' + '+'Δ'+o.getID()+' = '+res.radius)
+    res.steps.push('$\\Delta '+res.getID()+' = \\Delta '+@.getID()+' + '+'\\Delta '+o.getID()+' = '+res.radius+'$')
     res
 
   # Subtracts another interval
@@ -97,7 +97,7 @@ class ErrorInterval
 
     res = new ErrorInterval(a, da,  @.getID()+'-'+o.getID() ,true)
     res.steps = @.steps.concat(o.steps)
-    res.steps.push('Δ'+res.getID()+' = Δ'+@.getID()+' + '+'Δ'+o.getID()+' = '+res.radius)
+    res.steps.push('$\\Delta '+res.getID()+' = \\Delta '+@.getID()+' + '+'\\Delta '+o.getID()+' = '+res.radius+'$')
     res
 
 
@@ -110,9 +110,9 @@ class ErrorInterval
     rel = (@.relativeError() + o.relativeError()).toPrecision(2)
     da = rel * a
 
-    res = new ErrorInterval(a, da, @.getID()+'*'+o.getID(), true)
+    res = new ErrorInterval(a, da, @.getID()+' \\cdot '+o.getID(), true)
     res.steps = @.steps.concat(o.steps)
-    res.steps.push('Δ'+res.getID()+' = (δ'+@.getID()+' + δ'+o.getID()+') * '+@.getID()+' * '+o.getID()+' = '+res.radius)
+    res.steps.push('$\\Delta '+res.getID()+' = \\left(\\delta '+@.getID()+' + \\delta '+o.getID()+'\\right) \\cdot '+@.getID()+' \\cdot '+o.getID()+' = '+res.radius+'$')
     res
 
 
@@ -125,9 +125,9 @@ class ErrorInterval
     rel = (@.relativeError() + o.relativeError()).toPrecision(2)
     da = rel * a
 
-    res = new ErrorInterval(a, da, @.getID()+'/'+o.getID(), true)
+    res = new ErrorInterval(a, da, '\\frac{'+@.getID()+'}{'+o.getID()+'}', true)
     res.steps = @.steps.concat(o.steps)
-    res.steps.push('Δ'+res.getID()+' = (δ'+@.getID()+' + δ'+o.getID()+') * ('+@.getID()+' / '+o.getID()+') = '+res.radius)
+    res.steps.push('$\\Delta '+res.getID()+' = \\left(\\delta '+@.getID()+' + \\delta '+o.getID()+'\\right) \\cdot \\left(\\frac{'+@.getID()+'}{'+o.getID()+'}\\right) = '+res.radius+'$')
     res
 
 
@@ -141,11 +141,11 @@ class ErrorInterval
     da = rel * a
 
     expID = exp
-    if exp < 0 then expID = '('+exp+')'
+    if exp < 0 then expID = '\\left('+exp+'\\right)'
 
     res = new ErrorInterval(a, da, @.getID()+'^'+expID, true)
     res.steps = @.steps
-    res.steps.push('Δ'+res.getID()+' = |'+exp+'| * δ'+@.getID()+' * '+res.getID()+' = '+res.radius)
+    res.steps.push('$\\Delta '+res.getID()+' = \\|'+exp+'\\| \\cdot \\delta '+@.getID()+' \\cdot '+res.getID()+' = '+res.radius+'$')
     res
 
 
@@ -183,10 +183,10 @@ class ErrorInterval
 
   # @return [String]
   toString: ->
-    '['+@.getMedian()+'+-'+@.getRadius()+']'
+    '\\['+@.getMedian()+'\\pm'+@.getRadius()+'\\]'
 
   getID: ->
-    if @.calculated then '('+@.id+')'
+    if @.calculated then '\\left('+@.id+'\\right)'
     else @.id
 
   # Returns the median with the same number of digits after the comma 
@@ -212,7 +212,7 @@ class EndResult extends ErrorInterval
     @calculated = true
     @steps = steps
     if @steps.length > 0
-      @steps[@steps.length - 1] = @.steps[@.steps.length - 1].replace(/([^=\s]*)$/, @radius)
+      @steps[@steps.length - 1] = @.steps[@.steps.length - 1].replace(/([^=\s]*)$/, @radius) + '$'
   
   getRadius: ->
     (''+@radius.toPrecision(1))
