@@ -5,9 +5,11 @@
  */
 
 (function() {
-  var Physik, acos, add, applyOperator, asin, atan, convVal, create, createFromAnalogue, createFromDigital, div, endResult, mult, pow, sub;
+  var Physik, acos, add, addVariable, applyOperator, asin, atan, cleanVariables, convVal, create, createFromAnalogue, createFromDigital, createNamed, div, endResult, mult, pow, removeVariable, resetParser, resolveVariable, sub, variableExists, variables;
 
   Physik = require('./physik');
+
+  variables = {};
 
   add = function(a, b) {
     a = convVal(a);
@@ -54,7 +56,14 @@
     return new Physik.ErrorInterval(median, derivation);
   };
 
+  createNamed = function(median, derivation, name) {
+    return new Physik.ErrorInterval(median, derivation, name);
+  };
+
   createFromDigital = function(median, percentage, digit) {
+    if (arguments.length >= 4) {
+      return Physik.createFromDigitalMeasurement(convVal(median), Math.abs(percentage), Math.abs(digit), arguments[3]);
+    }
     return Physik.createFromDigitalMeasurement(convVal(median), Math.abs(percentage), Math.abs(digit));
   };
 
@@ -78,16 +87,25 @@
       case "asn":
         operand = operand.apply(asin);
         break;
+      case "asin":
+        operand = operand.apply(asin);
+        break;
       case "acs":
+        operand = operand.apply(acos);
+        break;
+      case "acos":
         operand = operand.apply(acos);
         break;
       case "atn":
         operand = operand.apply(atan);
         break;
-      case "log":
+      case "atan":
+        operand = operand.apply(atan);
+        break;
+      case "ln":
         operand = operand.apply(Math.log);
         break;
-      case "lgt":
+      case "log":
         operand = operand.apply(Physik.log10);
         break;
       default:
@@ -116,6 +134,30 @@
     return Math.atan(rad) * (180 / Math.PI);
   };
 
+  resolveVariable = function(variable) {
+    return variables[variable];
+  };
+
+  addVariable = function(varname, errorInterval) {
+    return variables[varname] = errorInterval;
+  };
+
+  removeVariable = function(varname) {
+    return delete variables[varname];
+  };
+
+  variableExists = function(varname) {
+    return variables.hasOwnProperty(varname);
+  };
+
+  cleanVariables = function() {
+    return variables = {};
+  };
+
+  resetParser = function() {
+    return Physik.resetIDGenerator();
+  };
+
   module.exports = {
     add: add,
     sub: sub,
@@ -125,9 +167,15 @@
     create: create,
     endResult: endResult,
     convVal: convVal,
+    createNamed: createNamed,
     applyOperator: applyOperator,
     createFromDigital: createFromDigital,
-    createFromAnalogue: createFromAnalogue
+    createFromAnalogue: createFromAnalogue,
+    resolveVariable: resolveVariable,
+    addVariable: addVariable,
+    removeVariable: removeVariable,
+    resetParser: resetParser,
+    variableExists: variableExists
   };
 
 }).call(this);

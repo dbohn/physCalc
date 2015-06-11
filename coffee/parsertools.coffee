@@ -5,6 +5,8 @@
 
 Physik = require('./physik');
 
+variables = {};
+
 # Adds two values, which should be either ErrorIntervals or numerical values
 #
 # @param [Float|Physik.ErrorInterval] Should be a ErrorInterval, otherwise it will be converted
@@ -70,7 +72,12 @@ endResult = (a) ->
 create = (median, derivation) ->
 	new Physik.ErrorInterval(median, derivation)
 
+createNamed = (median, derivation, name) ->
+	new Physik.ErrorInterval(median, derivation, name)
+
 createFromDigital = (median, percentage, digit) ->
+	if arguments.length >= 4
+		return Physik.createFromDigitalMeasurement(convVal(median), Math.abs(percentage), Math.abs(digit), arguments[3])
 	Physik.createFromDigitalMeasurement(convVal(median), Math.abs(percentage), Math.abs(digit))
 
 createFromAnalogue = (measured, grade, interval) ->
@@ -85,10 +92,13 @@ applyOperator = (operator, operand) ->
 		when "cos" then operand = operand.apply(Physik.cos)
 		when "tan" then operand = operand.apply(Physik.tan)
 		when "asn" then operand = operand.apply(asin)
+		when "asin" then operand = operand.apply(asin)
 		when "acs" then operand = operand.apply(acos)
+		when "acos" then operand = operand.apply(acos)
 		when "atn" then operand = operand.apply(atan)
-		when "log" then operand = operand.apply(Math.log)
-		when "lgt" then operand = operand.apply(Physik.log10)
+		when "atan" then operand = operand.apply(atan)
+		when "ln" then operand = operand.apply(Math.log)
+		when "log" then operand = operand.apply(Physik.log10)
 		else operand = operand
 	operand
 
@@ -104,4 +114,32 @@ acos = (rad) ->
 atan = (rad) ->
 	Math.atan(rad)*(180/Math.PI)
 
-module.exports = {add, sub, mult, div, pow, create, endResult, convVal, applyOperator, createFromDigital, createFromAnalogue}
+resolveVariable = (variable) ->
+	# console.log(variables)
+	variables[variable];
+	# create(0, 0)
+
+addVariable = (varname, errorInterval) ->
+	variables[varname] = errorInterval
+
+removeVariable = (varname) ->
+	delete variables[varname]
+
+variableExists = (varname) ->
+	# console.log(varname, variables, variables.hasOwnProperty(varname))
+	variables.hasOwnProperty(varname)
+
+cleanVariables = () ->
+	variables = {}
+
+resetParser = () ->
+	Physik.resetIDGenerator()
+
+module.exports = {
+	add, sub, mult, div, pow,
+	create, endResult, convVal, createNamed,
+	applyOperator, createFromDigital,
+	createFromAnalogue, resolveVariable,
+	addVariable, removeVariable,
+	resetParser, variableExists
+}

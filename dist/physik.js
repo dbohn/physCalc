@@ -59,6 +59,8 @@
         this.id = getNewID();
       }
       this.steps = [];
+      this.unparsedMedian = median;
+      this.unparsedRadius = radius;
     }
 
     ErrorInterval.prototype.relativeError = function() {
@@ -89,7 +91,7 @@
       var a, da, rel, res;
       a = this.median * o.median;
       rel = (this.relativeError() + o.relativeError()).toPrecision(2);
-      da = (rel * a).toPrecision(2);
+      da = rel * a;
       res = new ErrorInterval(a, da, this.getID() + '*' + o.getID(), true);
       res.steps = this.steps.concat(o.steps);
       res.steps.push('Δ' + res.getID() + ' = (δ' + this.getID() + ' + δ' + o.getID() + ') * ' + this.getID() + ' * ' + o.getID() + ' = ' + res.radius);
@@ -100,7 +102,7 @@
       var a, da, rel, res;
       a = this.median / o.median;
       rel = (this.relativeError() + o.relativeError()).toPrecision(2);
-      da = (rel * a).toPrecision(2);
+      da = rel * a;
       res = new ErrorInterval(a, da, this.getID() + '/' + o.getID(), true);
       res.steps = this.steps.concat(o.steps);
       res.steps.push('Δ' + res.getID() + ' = (δ' + this.getID() + ' + δ' + o.getID() + ') * (' + this.getID() + ' / ' + o.getID() + ') = ' + res.radius);
@@ -111,7 +113,7 @@
       var a, da, expID, rel, res;
       a = Math.pow(this.median, exp);
       rel = (this.relativeError() * Math.abs(exp)).toPrecision(2);
-      da = (rel * a).toPrecision(2);
+      da = rel * a;
       expID = exp;
       if (exp < 0) {
         expID = '(' + exp + ')';
@@ -199,8 +201,12 @@
   createFromDigitalMeasurement = function(val, p, d) {
     var da;
     da = (p / 100) * val.median;
-    da += d * Math.pow(10, -decimalPlaces(val.median));
-    return new ErrorInterval(val.median, da);
+    da += d * Math.pow(10, -decimalPlaces(val.unparsedMedian));
+    if (arguments.length >= 4) {
+      return new ErrorInterval(val.median, da, arguments[3]);
+    } else {
+      return new ErrorInterval(val.median, da);
+    }
   };
 
   sin = function(v) {

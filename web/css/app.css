@@ -6530,6 +6530,43 @@ button.close {
 .top .inputfield.has-success button {
   border-color: #5cb85c;
 }
+.varrow {
+  margin: 0 auto !important;
+}
+.varinput {
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  width: 70%;
+}
+.varinput input {
+  border-radius: 0;
+  border-left: none;
+  border-right: none;
+}
+.varinput input:first-child {
+  border-left: 1px solid #ccc;
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
+}
+.varinput .separator {
+  width: 10%;
+  font-size: 14px;
+  line-height: 1.42857143;
+  height: 34px;
+  background: #eeeeee;
+  font-weight: bold;
+  padding: 7px 12px 8px 12px;
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  text-align: center;
+}
+.varinput input:last-child,
+.varinput .separator:last-child {
+  border-right: 1px solid #ccc;
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+}
 .result_container,
 .error_container {
   background: #fff;
