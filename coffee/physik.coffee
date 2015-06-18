@@ -102,7 +102,7 @@ class ErrorInterval
 
     res = new ErrorInterval(a, da, @.getID()+'+'+o.getID(), true)
     res.steps = @.steps.concat(o.steps)
-    res.steps.push('$\\Delta '+res.getID()+' = \\Delta '+@.getID()+' + '+'\\Delta '+o.getID()+' = '+res.radius+'$')
+    res.steps.push('$\\Delta '+res.getID()+' = \\Delta '+@.getID()+' + '+'\\Delta '+o.getID()+' = '+res.getRadius()+'$')
     res
 
   # Subtracts another interval
@@ -115,7 +115,7 @@ class ErrorInterval
 
     res = new ErrorInterval(a, da,  @.getID()+'-'+o.getID() ,true)
     res.steps = @.steps.concat(o.steps)
-    res.steps.push('$\\Delta '+res.getID()+' = \\Delta '+@.getID()+' + '+'\\Delta '+o.getID()+' = '+res.radius+'$')
+    res.steps.push('$\\Delta '+res.getID()+' = \\Delta '+@.getID()+' + '+'\\Delta '+o.getID()+' = '+res.getRadius()+'$')
     res
 
 
@@ -130,7 +130,7 @@ class ErrorInterval
 
     res = new ErrorInterval(a, da, @.getID()+' \\cdot '+o.getID(), true)
     res.steps = @.steps.concat(o.steps)
-    res.steps.push('$\\Delta '+res.getID()+' = \\left(\\delta '+@.getID()+' + \\delta '+o.getID()+'\\right) \\cdot '+@.getID()+' \\cdot '+o.getID()+' = '+res.radius+'$')
+    res.steps.push('$\\Delta '+res.getID()+' = \\left(\\delta '+@.getID()+' + \\delta '+o.getID()+'\\right) \\cdot '+@.getID()+' \\cdot '+o.getID()+' = '+res.getRadius()+'$')
     res
 
 
@@ -145,7 +145,7 @@ class ErrorInterval
 
     res = new ErrorInterval(a, da, '\\frac{'+@.getID()+'}{'+o.getID()+'}', true)
     res.steps = @.steps.concat(o.steps)
-    res.steps.push('$\\Delta '+res.getID()+' = \\left(\\delta '+@.getID()+' + \\delta '+o.getID()+'\\right) \\cdot \\left(\\frac{'+@.getID()+'}{'+o.getID()+'}\\right) = '+res.radius+'$')
+    res.steps.push('$\\Delta '+res.getID()+' = \\left(\\delta '+@.getID()+' + \\delta '+o.getID()+'\\right) \\cdot \\left(\\frac{'+@.getID()+'}{'+o.getID()+'}\\right) = '+res.getRadius()+'$')
     res
 
 
@@ -163,7 +163,7 @@ class ErrorInterval
 
     res = new ErrorInterval(a, da, @.getID()+'^'+expID, true)
     res.steps = @.steps
-    res.steps.push('$\\Delta '+res.getID()+' = \\left|'+exp+'\\right| \\cdot \\delta '+@.getID()+' \\cdot '+res.getID()+' = '+res.radius+'$')
+    res.steps.push('$\\Delta '+res.getID()+' = \\left|'+exp+'\\right| \\cdot \\delta '+@.getID()+' \\cdot '+res.getID()+' = '+res.getRadius()+'$')
     res
 
 
@@ -187,7 +187,7 @@ class ErrorInterval
     dk = Math.abs(f((@median + @radius)) - k)
     res = new ErrorInterval(k, dk, '\\text{'+name+'} \\left('+@.getID()+'\\right)' ,true)
     res.steps = @.steps
-    res.steps.push('$\\Delta '+res.getID()+' = \\left| \\text{'+name+'}\\left('+@.getID()+' + \\Delta '+@.getID()+'\\right) - \\text{'+name+'}\\left('+@.getID()+'\\right)\\right| = '+res.radius+'$')
+    res.steps.push('$\\Delta '+res.getID()+' = \\left| \\text{'+name+'}\\left('+@.getID()+' + \\Delta '+@.getID()+'\\right) - \\text{'+name+'}\\left('+@.getID()+'\\right)\\right| = '+res.getRadius()+'$')
     res
 
   # Create an error interval based on this interval
@@ -234,7 +234,7 @@ class EndResult extends ErrorInterval
     @calculated = true
     @steps = steps
     if @steps.length > 0
-      @steps[@steps.length - 1] = @.steps[@.steps.length - 1].replace(/([^=\s]*)$/, @radius) + '$'
+      @steps[@steps.length - 1] = @.steps[@.steps.length - 1].replace(/([^=\s]*)$/, @.getRadius()) + '$'
   
   getRadius: ->
     (''+@radius.toPrecision(1))
