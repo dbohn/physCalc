@@ -92,6 +92,9 @@ class ErrorInterval
   relativeError: -> 
     Math.abs parseFloat (@radius / @median).toPrecision(2)
 
+  rawRelativeError: ->
+    Math.abs parseFloat (@radius / @median)
+
   # Adds another interval
   #
   # @param [ErrorInterval] o the other interval
@@ -125,7 +128,7 @@ class ErrorInterval
   # @return [ErrorInterval] result
   mult: (o) ->
     a = @median * o.median
-    rel = (@.relativeError() + o.relativeError()).toPrecision(2)
+    rel = @.rawRelativeError() + o.rawRelativeError()
     da = rel * a
 
     res = new ErrorInterval(a, da, @.getID()+' \\cdot '+o.getID(), true)
@@ -140,7 +143,7 @@ class ErrorInterval
   # @return [ErrorInterval] result
   div: (o) ->
     a = @median / o.median
-    rel = (@.relativeError() + o.relativeError()).toPrecision(2)
+    rel = @.rawRelativeError() + o.rawRelativeError()
     da = rel * a
 
     res = new ErrorInterval(a, da, '\\frac{'+@.getID()+'}{'+o.getID()+'}', true)
@@ -155,7 +158,7 @@ class ErrorInterval
   # @return [ErrorInterval] result
   pow: (exp) ->
     a = Math.pow(@median, exp)
-    rel = (@.relativeError() * Math.abs(exp)).toPrecision(2)
+    rel = @.rawRelativeError() * Math.abs(exp)
     da = rel * a
 
     expID = exp
